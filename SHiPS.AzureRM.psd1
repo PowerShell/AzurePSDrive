@@ -8,7 +8,7 @@
 RootModule = '.\SHiPS.AzureRM.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.4.0'
+ModuleVersion = '0.5.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -47,7 +47,15 @@ Copyright = '(c) Microsoft Corporation. All rights reserved.'
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-RequiredModules = @(@{ModuleName='AzureRM.Profile'; ModuleVersion='3.2.0'}, @{ModuleName='AzureRM.Resources'; ModuleVersion='4.2.0'}, 'AzureRM.Compute', 'AzureRM.Websites', 'Azure.Storage','SHiPS')
+RequiredModules = if($PSEdition -eq 'Core')
+{
+    #Bug in AzureRM.Websites.netcore. @('AzureRM.Profile.netcore', 'AzureRM.Resources.netcore', 'AzureRM.Compute.netcore', 'AzureRM.Websites.netcore', 'AzureRM.Storage.netcore','SHiPS')
+    @('AzureRM.Profile.netcore', 'AzureRM.Resources.netcore', 'AzureRM.Compute.netcore', 'AzureRM.Storage.netcore','SHiPS')
+}
+else #Desktop
+{
+    @('AzureRM.Profile', 'AzureRM.Resources', 'AzureRM.Compute', 'AzureRM.Websites', 'Azure.Storage','SHiPS')
+}
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
