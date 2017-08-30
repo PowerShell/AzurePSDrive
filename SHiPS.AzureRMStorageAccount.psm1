@@ -1,5 +1,9 @@
 ﻿using namespace Microsoft.PowerShell.SHiPS
 
+$script:Azure_Storage = if($IsCoreCLR){'AzureRM.Storage.NetCore'}else{'Azure.Storage'}
+$script:AzureRM_Storage = if($IsCoreCLR){'AzureRM.Storage.NetCore'}else{'AzureRM.Storage'}
+
+
 [SHiPSProvider(UseCache=$true)]
 class StorageAccounts : SHiPSDirectory
 {
@@ -14,7 +18,7 @@ class StorageAccounts : SHiPSDirectory
     [object[]] GetChildItem()
     {
         $obj =  @()                     
-        @(AzureRM.Storage\Get-AzureRmStorageAccount).Foreach{
+        @(& "$script:AzureRM_Storage\Get-AzureRmStorageAccount").Foreach{
              $obj += [StorageAccount]::new($($_.StorageAccountName), $_) 
         }          
         return $obj 
@@ -37,7 +41,7 @@ class StorageAccount : SHiPSDirectory
 
         $ev = $null
         try{
-                $result=Azure.Storage\Get-AzureStorageContainer -Context $this.data.Context -ErrorAction SilentlyContinue -ErrorVariable ev
+                $result=& "$script:Azure_Storage\Get-AzureStorageContainer" -Context $this.data.Context -ErrorAction SilentlyContinue -ErrorVariable ev
                 if($ev) {
                     Write-Verbose $ev.Exception
                 }else{
@@ -47,7 +51,7 @@ class StorageAccount : SHiPSDirectory
                 Write-Verbose $_.Exception
             }
         try{
-                $result=Azure.Storage\Get-AzureStorageShare -Context $this.data.Context -ErrorAction SilentlyContinue -ErrorVariable ev
+                $result=& "$script:Azure_Storage\Get-AzureStorageShare" -Context $this.data.Context -ErrorAction SilentlyContinue -ErrorVariable ev
                 if($ev) {
                     Write-Verbose $ev.Exception
                 } else {
@@ -59,7 +63,7 @@ class StorageAccount : SHiPSDirectory
          }
             
         try {
-                $result=Azure.Storage\Get-AzureStorageTable -Context $this.data.Context  -ErrorAction SilentlyContinue -ErrorVariable ev
+                $result=& "$script:Azure_Storage\Get-AzureStorageTable" -Context $this.data.Context  -ErrorAction SilentlyContinue -ErrorVariable ev
                 if($ev){
                     Write-Verbose $ev.Exception 
                 } else {
@@ -70,7 +74,7 @@ class StorageAccount : SHiPSDirectory
         }
 
         try {
-            $result=Azure.Storage\Get-AzureStorageQueue -Context $this.data.Context -ErrorAction SilentlyContinue -ErrorVariable ev
+            $result=& "$script:Azure_Storage\Get-AzureStorageQueue" -Context $this.data.Context -ErrorAction SilentlyContinue -ErrorVariable ev
             if($ev){
                 Write-Verbose $ev.Exception
             } else {                    
@@ -213,7 +217,7 @@ class FileShare : SHiPSDirectory
     {
         $obj =  @()
 
-        Azure.Storage\Get-AzureStorageFile -Context $this.context -ShareName $this.shareName | ForEach-Object {
+        & "$script:Azure_Storage\Get-AzureStorageFile" -Context $this.context -ShareName $this.shareName | ForEach-Object {
             if($_.GetType().Name -eq "CloudFileDirectory") {
                 $obj+=[FileFolder]::new($_.Name, $_)
             } else {
@@ -249,7 +253,7 @@ class FileFolder : SHiPSDirectory
     { 
         $obj =  @()
 
-        Azure.Storage\Get-AzureStorageFile -Directory $this.CloudFileDirectory | ForEach-Object {
+        & "$script:Azure_Storage\Get-AzureStorageFile" -Directory $this.CloudFileDirectory | ForEach-Object {
             if($_.GetType().Name -eq "CloudFileDirectory") {
                 $obj+=[FileFolder]::new($_.Name, $_)
             } else {
@@ -272,7 +276,7 @@ class Blob : SHiPSDirectory
 
     [object[]] GetChildItem()
     {      
-        return @(Azure.Storage\Get-AzureStorageBlob -Context $this.data.Context -Container $this.data.Name | Sort-Object Name)
+        return @(& "$script:Azure_Storage\Get-AzureStorageBlob" -Context $this.data.Context -Container $this.data.Name | Sort-Object Name)
     }
 }
 
