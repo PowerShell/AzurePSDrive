@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Configuration>  
-<ViewDefinitions>
+ <ViewDefinitions>
   <View>
     <Name>AllWebAppTable</Name>
     <ViewSelectedBy>
@@ -40,7 +40,7 @@
       <TableColumnHeader><Width>50</Width><Label>Name</Label></TableColumnHeader>
       <TableColumnHeader><Width>40</Width><Label>ResourceType</Label></TableColumnHeader>    
       <TableColumnHeader><Width>25</Width><Label>ResourceGroupName</Label></TableColumnHeader>   
-      <TableColumnHeader><Width>10</Width><Label>Location</Label></TableColumnHeader>
+      <TableColumnHeader><Label>Location</Label></TableColumnHeader>
      </TableHeaders>
      <TableRowEntries>
       <TableRowEntry>
@@ -594,5 +594,5 @@
      </TableRowEntries>
     </TableControl>
    </View>   
-  </ViewDefinitions>
+ </ViewDefinitions>
 </Configuration>
