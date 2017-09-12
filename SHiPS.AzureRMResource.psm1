@@ -16,6 +16,6 @@ class AllResources : SHiPSDirectory
 
     [object[]] GetChildItem()
     {
-        return @(& "$script:AzureRM_Resources\Get-AzureRmResource" | %{ $_.psobject.typenames.Insert(0, "SHiPS.AzureRMResourceType"); $_ })
+        return @(& "$script:AzureRM_Resources\Get-AzureRmResource" | %{ $_.psobject.typenames.Insert(0, "AzurePSDriveResourceType"); $_ })
     }
  }

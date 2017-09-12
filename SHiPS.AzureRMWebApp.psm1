@@ -22,7 +22,7 @@ class WebApps : SHiPSDirectory
             Import-Module AzureRM.Websites.Netcore
         }
 
-        return @(& "$script:AzureRM_WebApp\Get-AzureRmWebApp" | %{ $_.psobject.typenames.Insert(0, "SHiPS.AzureRMWebApp"); $_ })
+        return @(& "$script:AzureRM_WebApp\Get-AzureRmWebApp" | %{ $_.psobject.typenames.Insert(0, "AzurePSDriveWebApp"); $_ })
 
     }
  }

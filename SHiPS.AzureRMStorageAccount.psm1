@@ -105,7 +105,7 @@ class Blobs : SHiPSDirectory
     {     
         if(-not $this.result)
         {
-            Write-Debug "SHiPS.AzureRM: No Blobs."
+            Write-Debug "AzurePSDrive: No Blobs."
             return $null
         }
 
@@ -133,7 +133,7 @@ class Files : SHiPSDirectory
     {      
         if(-not $this.result)
         {
-            Write-Debug "SHiPS.AzureRM: No Files found."
+            Write-Debug "AzurePSDrive: No Files found."
             return $null
         }
 
