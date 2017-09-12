@@ -1,12 +1,4 @@
-﻿<#
-    $driveName = 'Azure'
-    Remove-PSDrive $driveName -ErrorAction SilentlyContinue
-    Import-Module .\SHiPS.AzureRM.psd1 -Force
-    New-PSDrive -Name $driveName -PSProvider SHiPS -Root SHiPS.AzureRM#Azure
-    cd $driveName":"
-#>
-
-using namespace Microsoft.PowerShell.SHiPS
+﻿using namespace Microsoft.PowerShell.SHiPS
 using module .\SHiPS.AzureRMResource.psm1
 using module .\SHiPS.AzureRMStorageAccount.psm1
 using module .\SHiPS.AzureRMVM.psm1
@@ -16,8 +8,7 @@ $script:AzureRM_Profile = if($IsCoreCLR){'AzureRM.Profile.NetCore'}else{'AzureRM
 $script:AzureRM_Resources = if($IsCoreCLR){'AzureRM.Resources.Netcore'}else{'AzureRM.Resources'}
 
 # Automatically pick resource group when inside resourcegroups of Azure drive
-# Using .Add to ensure we don't blow away any other changes
-$Global:PSDefaultParameterValues.Add('*-AzureRM*:ResourceGroupName',{if($pwd -like 'Azure:\*\ResourceGroups\*'){$RgName = ($pwd -split '\\')[3]; Write-Verbose "Using ResourceGroupName = $RgName"; $RgName}})
+$Global:PSDefaultParameterValues['*-AzureRM*:ResourceGroupName'] = {if($pwd -like 'Azure:\*\ResourceGroups\*'){($pwd -split '\\')[3]}}
 
 [SHiPSProvider(UseCache=$true)]
 class Azure : SHiPSDirectory
