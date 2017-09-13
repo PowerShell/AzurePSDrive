@@ -15,7 +15,7 @@ class VirtualMachines : SHiPSDirectory
 
     [object[]] GetChildItem()
     {
-        return @(& "$script:AzureRM_Compute\Get-AzureRmVM" -Status | %{ $_.psobject.typenames.Insert(0, "SHiPS.AzureRmVM"); $_ })
+        return @(& "$script:AzureRM_Compute\Get-AzureRmVM" -Status | %{ $_.psobject.typenames.Insert(0, "AzurePSDriveVM"); $_ })
     }
  }
 

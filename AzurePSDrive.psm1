@@ -1,8 +1,8 @@
 ﻿using namespace Microsoft.PowerShell.SHiPS
-using module .\SHiPS.AzureRMResource.psm1
-using module .\SHiPS.AzureRMStorageAccount.psm1
-using module .\SHiPS.AzureRMVM.psm1
-using module .\SHiPS.AzureRMWebApp.psm1
+using module .\AzurePSDriveResource.psm1
+using module .\AzurePSDriveStorageAccount.psm1
+using module .\AzurePSDriveVM.psm1
+using module .\AzurePSDriveWebApp.psm1
 
 $script:AzureRM_Profile = if($IsCoreCLR){'AzureRM.Profile.NetCore'}else{'AzureRM.Profile'}
 $script:AzureRM_Resources = if($IsCoreCLR){'AzureRM.Resources.Netcore'}else{'AzureRM.Resources'}
@@ -39,7 +39,7 @@ class Azure : SHiPSDirectory
             $defaultTenantId = $tenant[0].Id
             Write-Verbose "Using TenantId '$($tenant[0].TenantId)'"                
             Write-Verbose "To change default tenant: Use AzureRM.profile\Get-AzureRmTenant to retrieve your tenants corresponding to directories and set environment variable 'ACC_TID' to desired tenant"
-            Write-Verbose "Reload SHiPS.AzureRM provider OR use 'dir -force' when navigating the subscription"
+            Write-Verbose "Reload AzurePSDrive provider OR use 'dir -force' when navigating the subscription"
         }
         else
         {

@@ -12,7 +12,7 @@
                 <CustomItem>
                   <Text>Directory: </Text>
                   <ExpressionBinding>
-                      <ScriptBlock>$drv = $_.PSDRIVE; $_.PSPARENTPATH -replace ".*#" -replace "^${drv}","${drv}:"</ScriptBlock>
+                      <ScriptBlock>$drv = $_.PSDRIVE; $_.PSPARENTPATH -replace ".*#" -replace "^.[^\\/]*","${drv}:"</ScriptBlock>
                   </ExpressionBinding>
                   <NewLine/>
                 </CustomItem>
@@ -60,7 +60,7 @@
     <View>
       <Name>AllWebAppTable</Name>
       <ViewSelectedBy>
-          <TypeName>SHiPS.AzureRMWebApp</TypeName>
+          <TypeName>AzurePSDriveWebApp</TypeName>
           <TypeName>Microsoft.Azure.Management.WebSites.Models.Site</TypeName>
           <TypeName>Microsoft.Azure.Management.WebSites.Models.Resource</TypeName>
       </ViewSelectedBy>
@@ -92,7 +92,7 @@
     <View>
       <Name>AllResourcesTable</Name>
       <ViewSelectedBy>
-          <TypeName>SHiPS.AzureRMResourceType</TypeName> 
+          <TypeName>AzurePSDriveResourceType</TypeName> 
       </ViewSelectedBy>
       <GroupBy>
           <PropertyName>PSParentPath</PropertyName>
@@ -146,7 +146,7 @@
     <View>
         <Name>Microsoft.Azure.Commands.Compute.Models.PSVirtualMachineListStatus</Name>
         <ViewSelectedBy>
-          <TypeName>SHiPS.AzureRmVM</TypeName>
+          <TypeName>AzurePSDriveVM</TypeName>
           <TypeName>Microsoft.Azure.Commands.Compute.Models.PSVirtualMachineListStatus</TypeName>
         </ViewSelectedBy>
         <GroupBy>

@@ -1,4 +1,4 @@
-SHiPS.AzureRM provider is a SHiPS based PowerShell provider to 
+AzurePSDrive provider is a SHiPS based PowerShell provider to 
 simplify navigation and discovery of Azure Resource Manager items.
 
 Copyright (c) Microsoft Corporation
