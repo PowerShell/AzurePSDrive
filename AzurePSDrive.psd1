@@ -1,11 +1,11 @@
 ﻿#
-# Module manifest for module 'SHiPS.AzureRM'
+# Module manifest for module 'AzurePSDrive'
 #
 
 @{
 
 # Script module or binary module file associated with this manifest.
-RootModule = '.\SHiPS.AzureRM.psm1'
+RootModule = '.\AzurePSDrive.psm1'
 
 # Version number of this module.
 ModuleVersion = '0.5.0'
@@ -67,7 +67,7 @@ else #Desktop
 # TypesToProcess = @()
 
 # Format files (.ps1xml) to be loaded when importing this module
-FormatsToProcess = @('SHiPS.AzureRM.Format.ps1xml')
+FormatsToProcess = @('AzurePSDrive.Format.ps1xml')
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 # NestedModules = @()

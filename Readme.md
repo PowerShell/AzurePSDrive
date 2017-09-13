@@ -1,10 +1,10 @@
 ### Introduction:
-SHiPS.AzureRM provider is a [SHiPS](https://github.com/PowerShell/SHiPS) based PowerShell provider to simplify navigation and discovery of [Azure Resource Manager](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview) items. This is based on [AzureRM cmdlets](https://msdn.microsoft.com/en-us/library/mt125356.aspx).
+AzurePSDrive provider is a [SHiPS](https://github.com/PowerShell/SHiPS) based PowerShell provider to simplify navigation and discovery of [Azure Resource Manager](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview) items. This is based on [AzureRM cmdlets](https://msdn.microsoft.com/en-us/library/mt125356.aspx).
 The provider allows to browse Azure resources such as Subscriptions, ResourceGroups, deployments in providers such as Compute, Network, Storage. Deployments such as VirtualMachines, StorageContainers, NetworkInterfaces, SecurityGroups, VNets, WebApps can be seamlessly discovered including useful data about these.
 
 
 ### Usage:
-Using this provider is self explanatory. You are encouraged to traverse various resources such as Compute, Network, Storage, WebApps and so on. SHiPS.AzureRM provider shows only AzureRM providers that have deployments such as Virtual machines, Storage Containers.
+Using this provider is self explanatory. You are encouraged to traverse various resources such as Compute, Network, Storage, WebApps and so on. AzurePSDrive provider shows only AzureRM providers that have deployments such as Virtual machines, Storage Containers.
 This version supports only retrieving Resource Manager items.
 
 ```
@@ -13,8 +13,8 @@ This version supports only retrieving Resource Manager items.
 
 # Create a drive for AzureRM
 $driveName = 'Az'
-Import-Module SHiPS.AzureRM
-New-PSDrive -Name $driveName -PSProvider SHiPS -Root SHiPS.AzureRM#Azure
+Import-Module AzurePSDrive
+New-PSDrive -Name $driveName -PSProvider SHiPS -Root AzurePSDrive#Azure
 
 cd $driveName":"
 ```
