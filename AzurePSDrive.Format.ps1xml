@@ -12,7 +12,7 @@
                 <CustomItem>
                   <Text>Directory: </Text>
                   <ExpressionBinding>
-                      <ScriptBlock>$drv = $_.PSDRIVE; $_.PSPARENTPATH -replace ".*#" -replace "^${drv}","${drv}:"</ScriptBlock>
+                      <ScriptBlock>$drv = $_.PSDRIVE; $_.PSPARENTPATH -replace ".*#" -replace "^.[^\\/]*","${drv}:"</ScriptBlock>
                   </ExpressionBinding>
                   <NewLine/>
                 </CustomItem>
