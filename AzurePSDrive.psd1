@@ -8,7 +8,7 @@
 RootModule = '.\AzurePSDrive.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.5.0'
+ModuleVersion = '0.6.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -26,7 +26,7 @@ CompanyName = 'Microsoft Corporation'
 Copyright = '(c) Microsoft Corporation. All rights reserved.'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'AzurePSDrive provider is a SHiPS based PowerShell provider to simplify navigation and discovery of Azure Resource Manager items'
 
 # Minimum version of the Windows PowerShell engine required by this module
 # PowerShellVersion = ''
@@ -76,13 +76,13 @@ FormatsToProcess = @('AzurePSDrive.Format.ps1xml')
 FunctionsToExport = @()
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-# CmdletsToExport = '*'
+CmdletsToExport = @()
 
 # Variables to export from this module
-# VariablesToExport = '*'
+VariablesToExport = @()
 
 # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-# AliasesToExport = '*'
+AliasesToExport = @()
 
 # DSC resources to export from this module
 # DscResourcesToExport = @()
@@ -99,20 +99,20 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+        Tags = 'Azure', 'Navigation', 'SHiPS', 'AzureRM'
 
         # A URL to the license for this module.
-        # LicenseUri = ''
+        LicenseUri = 'https://github.com/PowerShell/AzurePSDrive/blob/master/LICENSE.txt'
 
         # A URL to the main website for this project.
-        # ProjectUri = ''
+        ProjectUri = 'https://github.com/PowerShell/AzurePSDrive'
 
         # A URL to an icon representing this module.
         # IconUri = ''
 
         # ReleaseNotes of this module
-        # ReleaseNotes = ''
-
+        ReleaseNotes = @' 
+'@
     } # End of PSData hashtable
 
 } # End of PrivateData hashtable
