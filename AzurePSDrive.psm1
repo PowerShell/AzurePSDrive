@@ -1,4 +1,4 @@
-﻿using namespace Microsoft.PowerShell.SHiPS
+using namespace Microsoft.PowerShell.SHiPS
 using module .\AzurePSDriveResource.psm1
 using module .\AzurePSDriveStorageAccount.psm1
 using module .\AzurePSDriveVM.psm1
@@ -23,23 +23,23 @@ class Azure : SHiPSDirectory
         
         $defaultTenantId = $null      
         
-        # CloudShell provides us with a default directory for Azure -> that maps to a tenant
+        # Cloud Shell provides us with a default directory for Azure -> that maps to a tenant
         # This is provided in the form of tenantId in env variable ACC_TID
         if (-not $env:ACC_TID)
         {
-            # Default tenantId not provided (perhaps provider is being run standalone => not in cloudshell)
+            # Default tenantId not provided (perhaps provider is being run standalone => not in Cloud Shell)
             $tenant = (& "$script:AzureRM_Profile\Get-AzureRmTenant")
 
             if (($tenant -eq $null) -or ($tenant.Count -eq 0))
             {
-                throw ('Unable to obtain tenant for the account. Check your subscription to ensure there is atleast one tenant')
+                throw ('Unable to obtain tenant for the account. Check your subscription to ensure there is at least one tenant')
             }
 
             # Use the first tenant, since this maps to the default directory chosen by the user via Portal
             $defaultTenantId = $tenant[0].Id
             Write-Verbose "Using TenantId '$($tenant[0].TenantId)'"                
             Write-Verbose "To change default tenant: Use AzureRM.profile\Get-AzureRmTenant to retrieve your tenants corresponding to directories and set environment variable 'ACC_TID' to desired tenant"
-            Write-Verbose "Reload AzurePSDrive provider OR use 'dir -force' when navigating the subscription"
+            Write-Verbose "Reload AzurePSDrive provider OR use 'dir -Force' when navigating the subscription"
         }
         else
         {
