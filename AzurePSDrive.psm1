@@ -184,7 +184,7 @@ class ResourceProvider : SHiPSDirectory
         $obj =  @()
 
         $resourceTypeTokens = @()
-        @(& "$script:AzureRM_Resources\Get-AzureRmResource" | Where-Object {$_.ResourceGroupName -eq $this.resourceGroupName} | Select-Object -Property ResourceType –Unique).ForEach{
+        @(& "$script:AzureRM_Resources\Get-AzureRmResource" | Where-Object {$_.ResourceGroupName -eq $this.resourceGroupName} | Select-Object -Property ResourceType -Unique).ForEach{
 
             $providerNS = $_.ResourceType.Split('/')[0]
             $resourceType = $_.ResourceType.Substring($_.ResourceType.IndexOf('/')+1)
