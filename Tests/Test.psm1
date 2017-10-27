@@ -1,4 +1,4 @@
-﻿$PSScriptRoot = $MyInvocation.MyCommand.Path
+$PSScriptRoot = $MyInvocation.MyCommand.Path
 
 function Invoke-AzurePSDriveTests
 {
@@ -82,4 +82,20 @@ function Initialize-TestEnvironment
     Import-Module AzureRM.Storage -Force -Verbose
     Import-Module SHiPS -Force -Verbose
     AzureRM.Profile\Disable-AzureRmDataCollection
+}
+
+# Login to AzureRM using Service Principal
+function Login-AzureRM
+{
+    # These values are supplied from the environment, such as using Appveyor encryption
+    # https://www.appveyor.com/docs/build-configuration/#secure-variables
+
+    $azureAdAppId = $env:azureADAppId
+    $password = $env:azurePassword
+    $tenantId = $env:azureTenantId
+
+    $secureString = ConvertTo-SecureString -String $password -AsPlainText -Force
+    $cred = New-Object System.Management.Automation.PSCredential($azureAdAppId, $secureString)
+
+    AzureRM.Profile\Login-AzureRmAccount -ServicePrincipal -Credential $cred -TenantId $tenantId -Verbose -ErrorAction Stop
 }
