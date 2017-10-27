@@ -36,22 +36,6 @@ function Test-Dependency
     }
 }
 
-# Login to AzureRM using Service Principal
-function Login-AzureRM
-{
-    # These values are supplied from the environment, such as using Appveyor encryption
-    # https://www.appveyor.com/docs/build-configuration/#secure-variables
-
-    $azureAdAppId = $env:azureADAppId
-    $password = $env:azurePassword
-    $tenantId = $env:azureTenantId
-
-    $secureString = ConvertTo-SecureString -String $password -AsPlainText -Force
-    $cred = New-Object System.Management.Automation.PSCredential($azureAdAppId, $secureString)
-
-    AzureRM.Profile\Login-AzureRmAccount -ServicePrincipal -Credential $cred -TenantId $tenantId -Verbose -ErrorAction Stop
-}
-
 # Create AzurePSDrive PowerShell Drive
 function New-AzureDrive
 {   
@@ -111,7 +95,6 @@ function Initialize-AzureTestResource
 #region Test Suite Initialization
 cd $PSScriptRoot
 Test-Dependency
-Login-AzureRM
 Initialize-AzureTestResource
 New-AzureDrive
 #endregion
