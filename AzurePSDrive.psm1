@@ -7,6 +7,13 @@ using module .\AzurePSDriveWebApp.psm1
 $script:AzureRM_Profile = if($IsCoreCLR){'AzureRM.Profile.NetCore'}else{'AzureRM.Profile'}
 $script:AzureRM_Resources = if($IsCoreCLR){'AzureRM.Resources.Netcore'}else{'AzureRM.Resources'}
 
+# Ensure Session is logged-on to access Azure resources
+$context = (& "$script:AzureRM_Profile\Get-AzureRmContext")
+if ([string]::IsNullOrEmpty($($context.Account)))
+{
+    throw "Ensure that session has access to Azure resources - use $script:AzureRM_Profile\Add-AzureRMAccount or $script:AzureRM_Profile\Login-AzureRMAccount"
+}
+
 # Automatically pick resource group when inside resourcegroups of Azure drive
 $Global:PSDefaultParameterValues['*-AzureRM*:ResourceGroupName'] = {if($pwd -like 'Azure:\*\ResourceGroups\*'){($pwd -split '\\')[3]}}
 
