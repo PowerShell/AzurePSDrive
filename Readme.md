@@ -1,7 +1,3 @@
-### Introduction:
-AzurePSDrive provider is a [SHiPS](https://github.com/PowerShell/SHiPS) based PowerShell provider to simplify navigation and discovery of [Azure Resource Manager](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview) items. This is based on [AzureRM cmdlets](https://msdn.microsoft.com/en-us/library/mt125356.aspx).
-The provider allows to browse Azure resources such as Subscriptions, ResourceGroups, deployments in providers such as Compute, Network, Storage. Deployments such as VirtualMachines, StorageContainers, NetworkInterfaces, SecurityGroups, VNets, WebApps can be seamlessly discovered including useful data about these.
-
 ### Build Status
 | Master       |  Development   |
 |-----------------------------------------|--------------------------|
@@ -13,6 +9,11 @@ The provider allows to browse Azure resources such as Subscriptions, ResourceGro
 
 [av-image-master]:https://ci.appveyor.com/api/projects/status/3cq2g6vq3j1gyp8h?svg=true
 [av-site-master]: https://ci.appveyor.com/project/PowerShell/azurepsdrive/branch/master
+
+
+### Introduction:
+AzurePSDrive provider is a [SHiPS](https://github.com/PowerShell/SHiPS) based PowerShell provider to simplify navigation and discovery of [Azure Resource Manager](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview) items. This is based on [AzureRM cmdlets](https://msdn.microsoft.com/en-us/library/mt125356.aspx).
+The provider allows to browse Azure resources such as Subscriptions, ResourceGroups, deployments in providers such as Compute, Network, Storage. Deployments such as VirtualMachines, StorageContainers, NetworkInterfaces, SecurityGroups, VNets, WebApps can be seamlessly discovered including useful data about these.
 
 ### Usage:
 Using this provider is self explanatory. You are encouraged to traverse various resources such as Compute, Network, Storage, WebApps and so on. AzurePSDrive provider shows only AzureRM providers that have deployments such as Virtual machines, Storage Containers.
