@@ -8,10 +8,10 @@ The provider allows to browse Azure resources such as Subscriptions, ResourceGro
 |  [![av-image-master][]][av-site-master] |[![av-image-dev][]][av-site-dev]
  
 
-[av-image-dev]: https://ci.appveyor.com/api/projects/status/o10wwthb3oiufyjv/branch/development?svg=true
+[av-image-dev]: https://ci.appveyor.com/api/projects/status/3cq2g6vq3j1gyp8h/branch/development?svg=true
 [av-site-dev]: https://ci.appveyor.com/project/PowerShell/azurepsdrive/branch/development
 
-[av-image-master]:https://ci.appveyor.com/api/projects/status/o10wwthb3oiufyjv/branch/master?svg=true
+[av-image-master]:https://ci.appveyor.com/api/projects/status/3cq2g6vq3j1gyp8h?svg=true
 [av-site-master]: https://ci.appveyor.com/project/PowerShell/azurepsdrive/branch/master
 
 ### Usage:
