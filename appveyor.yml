@@ -38,15 +38,15 @@ test_script:
         # value of type "System.Object[]" to type System.Management.Automation.PSModuleInfo"
         PowerShell -command 'Install-PackageProvider NuGet -Force -ForceBootstrap; Install-Module -Name PowerShellGet -Force -AllowClobber'
 
+        Write-Host "Import the test wrapper for AzurePSDrive"
+        Import-Module c:\projects\azurepsdrive\tests\test.psm1 -Force -Verbose
+        Initialize-TestEnvironment
+
         Write-Host "Install SHiPS module from PowerShellGallery - required dependency for AzurePSDrive"
         Install-Module -Name SHiPS -Force -Verbose -AllowClobber
 
         Write-Host "Import AzurePSDrive module to current session"
         Import-Module c:\projects\azurepsdrive\azurepsdrive.psd1 -Force -Verbose
-
-        Write-Host "Import the test wrapper for AzurePSDrive"
-        Import-Module c:\projects\azurepsdrive\tests\test.psm1 -Force -Verbose
-        Initialize-TestEnvironment
 
         Write-Host "Invoke AzurePSDrive Tests"
         Invoke-AzurePSDriveTests
