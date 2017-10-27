@@ -3,7 +3,7 @@ AzurePSDrive provider is a [SHiPS](https://github.com/PowerShell/SHiPS) based Po
 The provider allows to browse Azure resources such as Subscriptions, ResourceGroups, deployments in providers such as Compute, Network, Storage. Deployments such as VirtualMachines, StorageContainers, NetworkInterfaces, SecurityGroups, VNets, WebApps can be seamlessly discovered including useful data about these.
 
 ### Build Status
-| Master(Windows)       |  Development(Windows)   |
+| Master       |  Development   |
 |-----------------------------------------|--------------------------|
 |  [![av-image-master][]][av-site-master] |[![av-image-dev][]][av-site-dev]
  
