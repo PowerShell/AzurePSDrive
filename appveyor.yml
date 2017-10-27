@@ -4,6 +4,12 @@ environment:
   matrix:
   - APPVEYOR_BUILD_WORKER_IMAGE: WMF 5
     PowerShellEdition: Desktop
+  azureADAppId:
+    secure: 6ba+OxaNOynnaHdOojrzlEyj3I6EfSUXC5yaDXB51SiiyuCmij+gLUpEj/1Peyde
+  azurePassword:
+    secure: wJ7g62CzQMC5E8qcSGk4eg==
+  azureTenantId:
+    secure: vWkkrxzokM51lLgu89CeWCl9tTQVsP0aiuVWXAdSLuGWlxnqlmmfzhWAGubEKtY4
 
 configuration: Release
 platform: Any CPU
@@ -22,14 +28,6 @@ install:
 
 # to disable automatic builds
 build: off
-
-environment:
-  azureADAppId:
-    secure: 6ba+OxaNOynnaHdOojrzlEyj3I6EfSUXC5yaDXB51SiiyuCmij+gLUpEj/1Peyde
-  azurePassword:
-    secure: wJ7g62CzQMC5E8qcSGk4eg==
-  azureTenantId:
-    secure: vWkkrxzokM51lLgu89CeWCl9tTQVsP0aiuVWXAdSLuGWlxnqlmmfzhWAGubEKtY4
 
 # Run Pester tests and store the results
 test_script:
