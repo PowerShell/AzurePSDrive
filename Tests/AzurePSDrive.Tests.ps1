@@ -3,6 +3,10 @@
 # Ex: Drive:\Subscription\ResourceGroup\ResourceProvider\ResourceType
 # Note: There is a one time initialization of all Compute/Network/Storage resouces in Azure which is used by the Test Suite
 
+param (
+    [string]$subscriptionName = 'AutomationTeam'
+)
+
 #region Script variables
 $resourceGroupName = 'AzurePSDrive.Test'
 $location = 'WestUS'
@@ -110,8 +114,8 @@ Describe Get-Subscription {
 
         # Only one subscription corresponding to the service principal and tenant must be returned        
         $sub.Count | Should Be 1
-        $sub.Name | Should Be 'AutomationTeam'
-        $sub.SubscriptionName | Should Be 'AutomationTeam'
+        $sub.Name | Should Be $subscriptionName
+        $sub.SubscriptionName | Should Be $subscriptionName
 
         # Indicates that this is a DirectoryType object
         $sub.SSItemMode | Should Be '+'
@@ -139,7 +143,7 @@ Describe Get-Subscription {
 
         # Only one subscription corresponding to specified Filter must be returned      
         $sub.Count | Should Be 1
-        $sub.Name | Should Be 'AutomationTeam'
+        $sub.Name | Should Be $subscriptionName
         
     }
 
@@ -161,7 +165,7 @@ Describe Get-Subscription {
 #region Get-ResourceGroup Tests
 Describe Get-ResourceGroup {
     BeforeAll {
-        cd 'Azure:\AutomationTeam\ResourceGroups'
+        cd "Azure:\$subscriptionName\ResourceGroups"
     }
 
     It "Retrieving a ResourceGroup in the subscription using Force switch and wild card" {
@@ -232,7 +236,7 @@ Describe Get-ResourceGroup {
 #region Get-ResourceProvider Tests
 Describe Get-ResourceProvider {
     BeforeAll {
-        cd 'Azure:\AutomationTeam\ResourceGroups\AzurePSDrive.Test'
+        cd "Azure:\$subscriptionName\ResourceGroups\AzurePSDrive.Test"
     }
 
     It "Retrieving ResourceProviders in the ResourceGroup" {
@@ -299,7 +303,7 @@ Describe Get-ResourceType {
     It "Retrieving ResourceTypes in the ResourceType with and without Force switch" {
 
         # Verify Compute Type
-        cd 'Azure:\AutomationTeam\ResourceGroups\AzurePSDrive.Test\Microsoft.Compute'
+        cd "Azure:\$subscriptionName\ResourceGroups\AzurePSDrive.Test\Microsoft.Compute"
         $resourceTypes = dir               
         $resourceTypes.Count | Should Be 2
 
@@ -314,7 +318,7 @@ Describe Get-ResourceType {
         $diff | Should BeNullOrEmpty        
         
         # Verify Network Type
-        cd 'Azure:\AutomationTeam\ResourceGroups\AzurePSDrive.Test\Microsoft.Network'
+        cd "Azure:\$subscriptionName\ResourceGroups\AzurePSDrive.Test\Microsoft.Network"
         $resourceTypes = dir -Force              
         $resourceTypes.Count | Should Be 3
 
@@ -346,7 +350,7 @@ Describe Get-ResourceType {
     It "Using Filter parameter in ResourceType with Force switch" {
             
         # Verify Storage Type
-        cd 'Azure:\AutomationTeam\ResourceGroups\AzurePSDrive.Test\Microsoft.Storage'
+        cd "Azure:\$subscriptionName\ResourceGroups\AzurePSDrive.Test\Microsoft.Storage"
         $resourceType = dir -Filter *Storage* -Force
 
         # Only one ResourceType corresponding to specified Filter must be returned      
@@ -381,7 +385,7 @@ Describe Get-SpecificRMResourceType {
 
     It "Retrieving VM type using the Provider" {
 
-        cd 'Azure:\AutomationTeam\ResourceGroups\AzurePSDrive.Test\Microsoft.Compute\virtualMachines'
+        cd "Azure:\$subscriptionName\ResourceGroups\AzurePSDrive.Test\Microsoft.Compute\virtualMachines"
 
         $vm = dir
 
@@ -400,7 +404,7 @@ Describe Get-SpecificRMResourceType {
 
     It "Retrieving Network type using the Provider" {
 
-        cd 'Azure:\AutomationTeam\ResourceGroups\AzurePSDrive.Test\Microsoft.Network\networkInterfaces'
+        cd "Azure:\$subscriptionName\ResourceGroups\AzurePSDrive.Test\Microsoft.Network\networkInterfaces"
 
         $network = dir
 
@@ -424,8 +428,7 @@ Describe Get-SpecificRMResourceType {
 
       It "Retrieving Storage type using the Provider" {
 
-        cd 'Azure:\AutomationTeam\ResourceGroups\AzurePSDrive.Test\Microsoft.Storage\storageAccounts'
-
+        cd "Azure:\$subscriptionName\ResourceGroups\AzurePSDrive.Test\Microsoft.Storage\storageAccounts"
         $storage = dir
 
         # Validate all properties - Ensure they match the ones used during resource creation        
@@ -457,7 +460,7 @@ Describe Get-SpecificRMResourceType {
 #region Get-AllResources with Recurse functionality Tests
 Describe Get-AllResourcesWithRecurse {
     BeforeAll {     
-       cd 'Azure:\AutomationTeam\ResourceGroups\AzurePSDrive.Test'
+       cd "Azure:\$subscriptionName\ResourceGroups\AzurePSDrive.Test"
     }
 
     It "Retrieving all resources with Recurse switch from ResourceGroup top level" {
@@ -481,11 +484,11 @@ Describe Get-AllResourcesWithRecurse {
 Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
     BeforeAll {     
         Disable-AzureRmDataCollection
-        cd 'Azure:\AutomationTeam\'
+        cd "Azure:\$subscriptionName\"
     }
 
     It "Testing childitems under a subscription" {
-        cd 'Azure:\AutomationTeam\'
+        cd "Azure:\$subscriptionName\"
         $a = dir
 
         $a | ?{ $_.name -eq "AllResources" } | should not BeNullOrEmpty  
@@ -497,7 +500,7 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
     }    
     
     It "Retrieving all resources" {
-        cd 'Azure:\AutomationTeam\AllResources'
+        cd "Azure:\$subscriptionName\AllResources"
         $a = dir
 
         # We have a lot of items. Choose 10 here, a random number to ensure it is not 0
@@ -505,7 +508,7 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
     }
     
     It "Retrieving all VirtualMachines" {
-        cd 'Azure:\AutomationTeam\VirtualMachines'        
+        cd "Azure:\$subscriptionName\VirtualMachines"
         
         $a = dir
 
@@ -514,7 +517,7 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
     }    
     
     It "Retrieving all StorageAccounts" {
-        cd 'Azure:\AutomationTeam\StorageAccounts'        
+        cd "Azure:\$subscriptionName\StorageAccounts"
         
         # shipsazurermtest is azurepsdriveteststorage, AzurePSDrive.Test is resourcegroup
         $a = dir
@@ -538,7 +541,7 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
         $d=dir
         $d | Should  Not BeNullOrEmpty
 
-        cd 'Azure:\AutomationTeam\StorageAccounts\shipsazurermteststorage\Files'  
+        cd "Azure:\$subscriptionName\StorageAccounts\shipsazurermteststorage\Files"
         $e=dir
         $e | ?{ $_.name -eq "foo" } | should not BeNullOrEmpty  
        
@@ -546,11 +549,11 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
         $f=dir
         $f | Should Not BeNullOrEmpty
 
-        cd 'Azure:\AutomationTeam\StorageAccounts\shipsazurermteststorage\Tables' 
+        cd "Azure:\$subscriptionName\StorageAccounts\shipsazurermteststorage\Tables"
         $g=dir
         $g | Should Not BeNullOrEmpty
 
-        cd 'Azure:\AutomationTeam\StorageAccounts\shipsazurermteststorage\Queues' 
+        cd "Azure:\$subscriptionName\StorageAccounts\shipsazurermteststorage\Queues"
         $h=dir
         $h | Should Not BeNullOrEmpty 
     } 
