@@ -541,7 +541,7 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
         $d=dir
         $d | Should  Not BeNullOrEmpty
 
-        cd "Azure:\$subscriptionName\StorageAccounts\shipsazurermteststorage\Files"
+        cd "Azure:\$subscriptionName\StorageAccounts\azurepsdriveteststorage\Files"
         $e=dir
         $e | ?{ $_.name -eq "foo" } | should not BeNullOrEmpty  
        
@@ -549,11 +549,11 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
         $f=dir
         $f | Should Not BeNullOrEmpty
 
-        cd "Azure:\$subscriptionName\StorageAccounts\shipsazurermteststorage\Tables"
+        cd "Azure:\$subscriptionName\StorageAccounts\azurepsdriveteststorage\Tables"
         $g=dir
         $g | Should Not BeNullOrEmpty
 
-        cd "Azure:\$subscriptionName\StorageAccounts\shipsazurermteststorage\Queues"
+        cd "Azure:\$subscriptionName\StorageAccounts\azurepsdriveteststorage\Queues"
         $h=dir
         $h | Should Not BeNullOrEmpty 
     } 
