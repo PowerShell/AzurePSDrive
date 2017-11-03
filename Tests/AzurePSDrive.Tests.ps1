@@ -168,8 +168,8 @@ Describe Get-ResourceGroup {
         cd "Azure:\$subscriptionName\ResourceGroups"
     }
 
-    It "Retrieving a ResourceGroup in the subscription using Force switch and wild card" {
-        $rg = dir SHiPS.A*ureRM.Te*t -Force           
+    It "Retrieving a ResourceGroup in the subscription using Force switch and wild card" {        
+        $rg = dir A*urePSDrive.Te*t -Force       
         $rg.Count | Should Be 1
         
         # Indicates that this is a DirectoryType object        
@@ -181,15 +181,15 @@ Describe Get-ResourceGroup {
     }
 
     It "Retrieving a ResourceGroup in the subscription using wildcard in name" {
-        $rg = dir SHiPS.A*ureRM.Te*t           
+        $rg = dir A*urePSDrive.Te*t           
         $rg.Count | Should Be 1
         
         # Indicates that this is a DirectoryType object
         $rg.SSItemMode | Should Be '+'
         $rg.PSDrive | Should Be 'Azure'
         $rg.SubscriptionId | Should not BeNullOrEmpty
-        $rg.ResourceGroupName | Should Be 'SHiPS.AzureRM.Test'
-        $rg.Name | Should Be 'SHiPS.AzureRM.Test'
+        $rg.ResourceGroupName | Should Be 'AzurePSDrive.Test'
+        $rg.Name | Should Be 'AzurePSDrive.Test'
         $rg.Location | Should Be 'westus'
         $rg.ProvisioningState | Should Be 'Succeeded'
     }
@@ -219,7 +219,7 @@ Describe Get-ResourceGroup {
     }
 
     It "Using non-existant Filter in ResourceGroup" {
-        $rg = dir -Filter SHiPS.AzurRM*
+        $rg = dir -Filter AurePS*
 
         # None must be returned since supplied filter is non-existant     
         $rg | Should BeNullOrEmpty
