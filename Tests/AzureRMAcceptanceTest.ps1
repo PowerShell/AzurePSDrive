@@ -1,4 +1,4 @@
-﻿param (
+param (
     
     [parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
@@ -33,7 +33,7 @@ Write-Output "Ensure AzureRM.Resources, AzureRM.Profile, AzureRM.Compute, AzureR
 
 $azurePSDrivePath = (Join-Path $env:USERPROFILE 'AzurePSDrive')
 Write-Output "Clone AzurePSDrive Repo to '$azurePSDrivePath'"
-git clone https://github.com/PowerShell/AzurePSDrive.git -b master $azurePSDrivePath
+git clone https://github.com/PowerShell/AzurePSDrive.git -b development $azurePSDrivePath
 
 Write-Output "Update PowerShellGet"
 # Update PowerShellGet otherwise you will get an error 
