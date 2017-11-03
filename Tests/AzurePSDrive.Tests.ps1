@@ -174,8 +174,8 @@ Describe Get-ResourceGroup {
         
         # Indicates that this is a DirectoryType object        
         $rg.SubscriptionId | Should not BeNullOrEmpty
-        $rg.ResourceGroupName | Should Be 'SHiPS.AzureRM.Test'
-        $rg.Name | Should Be 'SHiPS.AzureRM.Test'
+        $rg.ResourceGroupName | Should Be 'AzurePSDrive.Test'
+        $rg.Name | Should Be 'AzurePSDrive.Test'
         $rg.Location | Should Be 'westus'
         $rg.ProvisioningState | Should Be 'Succeeded'
     }
