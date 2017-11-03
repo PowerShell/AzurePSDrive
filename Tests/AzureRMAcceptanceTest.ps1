@@ -1,4 +1,4 @@
-﻿param (
+param (
     
     [parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
