@@ -8,9 +8,9 @@ param (
 )
 
 #region Script variables
-$resourceGroupName = 'AzurePSDrive.Test'
+$resourceGroupName = "APSDT$(New-PartialGuidForName)"
 $location = 'WestUS'
-$storageAccountName = 'azurepsdriveteststorage'
+$storageAccountName = "APSDT$(New-PartialGuidForName)"
 $skuName = 'Standard_LRS'
 $interfaceName = 'TestInterface'
 $subnetName = 'TestSubnet1'
@@ -25,6 +25,8 @@ $osDiskName = $VMName + "OSDisk"
 #endregion
 
 #region Utility
+function New-PartialGuidForName { ([guid]::NewGuid().ToString() -replace '-','')[0..9] -join '' }
+
 # Verify that dependent modules required by the test are available in current session
 function Test-Dependency
 {

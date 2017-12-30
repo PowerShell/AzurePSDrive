@@ -17,6 +17,7 @@ param (
     [string]$azureTenantId
 
 )
+# Note: Administrator PowerShell required to run this script.
 
 $env:azureADAppId = $azureADAppId
 $env:azurePassword = $azurePassword
@@ -31,9 +32,10 @@ if (-not ($env:azureADAppId -and $env:azurePassword-and $env:azureTenantId))
 ## Install your version of AzureRM modules - specifically AzureRM.Resources, AzureRM.Profile, AzureRM.Compute, AzureRM.Network, AzureRM.Storage
 Write-Output "Ensure AzureRM.Resources, AzureRM.Profile, AzureRM.Compute, AzureRM.Network, AzureRM.Storage modules are installed"
 
-$azurePSDrivePath = (Join-Path $env:USERPROFILE 'AzurePSDrive')
-Write-Output "Clone AzurePSDrive Repo to '$azurePSDrivePath'"
-git clone https://github.com/PowerShell/AzurePSDrive.git -b development $azurePSDrivePath
+# $azurePSDrivePath = (Join-Path $env:USERPROFILE 'AzurePSDrive')
+# Write-Output "Clone AzurePSDrive Repo to '$azurePSDrivePath'"
+# git clone https://github.com/PowerShell/AzurePSDrive.git -b development $azurePSDrivePath
+$azurePSDrivePath = "$PSScriptRoot\.."
 
 Write-Output "Update PowerShellGet"
 # Update PowerShellGet otherwise you will get an error 
@@ -41,6 +43,9 @@ Write-Output "Update PowerShellGet"
 # value of type "System.Object[]" to type System.Management.Automation.PSModuleInfo"
 PowerShell -command 'Install-PackageProvider NuGet -Force -ForceBootstrap; Install-Module -Name PowerShellGet -Force -AllowClobber -Repository PSGallery'
 
+# SHiPS is untrusted repository. Setting PSGallery's policy to Trusted allows this to install without a prompt.
+# https://blogs.technet.microsoft.com/poshchap/2015/08/07/getting-started-with-the-powershell-gallery/
+Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 Write-Output "Install SHiPS module from PowerShellGallery - required dependency for AzurePSDrive"
 Install-Module -Name SHiPS -Verbose -Repository PSGallery
 
@@ -64,3 +69,5 @@ Import-Module (Join-Path $azurePSDrivePath 'azurepsdrive.psd1') -Force -Verbose
 
 Write-Output "Invoke AzurePSDrive Tests"
 Invoke-AzurePSDriveTests
+
+[Console]::Beep(2000, 300);[Console]::Beep(2000, 300);[Console]::Beep(2000, 300)
