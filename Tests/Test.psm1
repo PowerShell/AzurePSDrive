@@ -1,12 +1,12 @@
 $PSScriptRoot = $MyInvocation.MyCommand.Path
 
-function Invoke-AzurePSDriveTests
+function Invoke-AzurePSDriveTests([string]$subscriptionName = 'AutomationTeam')
 {
-        
     $testResultsFile = Microsoft.PowerShell.Management\Join-Path -Path $PSScriptRoot -ChildPath 'AzurePSDrive.TestResults.xml'
 
     Write-Host -ForegroundColor Green "Invoking Pester tests"
-    Invoke-Pester -Script $PSScriptRoot -OutputFormat NUnitXml -OutputFile $testResultsFile
+    # https://www.sapien.com/blog/2016/06/17/how-to-pass-parameters-to-a-pester-test-script/
+    Invoke-Pester -Script @{Path = $PSScriptRoot; Parameters = @{subscriptionName = $subscriptionName}} -OutputFormat NUnitXml -OutputFile $testResultsFile
 
     $testResults += [xml](Get-Content -Raw -Path $testResultsFile)
     $failedTestCount = 0

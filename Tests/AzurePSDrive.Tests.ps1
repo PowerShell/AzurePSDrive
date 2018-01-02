@@ -7,10 +7,12 @@ param (
     [string]$subscriptionName = 'AutomationTeam'
 )
 
+function New-PartialGuidForName { ([guid]::NewGuid().ToString() -replace '-','')[0..9] -join '' }
+
 #region Script variables
-$resourceGroupName = "APSDT$(New-PartialGuidForName)"
+$resourceGroupName = "apsdt$(New-PartialGuidForName)"
 $location = 'WestUS'
-$storageAccountName = "APSDT$(New-PartialGuidForName)"
+$storageAccountName = "apsdt$(New-PartialGuidForName)"
 $skuName = 'Standard_LRS'
 $interfaceName = 'TestInterface'
 $subnetName = 'TestSubnet1'
@@ -25,8 +27,6 @@ $osDiskName = $VMName + "OSDisk"
 #endregion
 
 #region Utility
-function New-PartialGuidForName { ([guid]::NewGuid().ToString() -replace '-','')[0..9] -join '' }
-
 # Verify that dependent modules required by the test are available in current session
 function Test-Dependency
 {
@@ -141,7 +141,8 @@ Describe Get-Subscription {
     }
 
     It "Using Filter parameter with Force in Subscription" {
-        $sub = dir -Force -Filter A*m
+        $subNameWild = "$($subscriptionName[0])*$($subscriptionName.Substring($subscriptionName.Length - 1))"
+        $sub = dir -Force -Filter $subNameWild
 
         # Only one subscription corresponding to specified Filter must be returned      
         $sub.Count | Should Be 1
@@ -171,27 +172,29 @@ Describe Get-ResourceGroup {
     }
 
     It "Retrieving a ResourceGroup in the subscription using Force switch and wild card" {        
-        $rg = dir A*urePSDrive.Te*t -Force       
+        $rgNameWild = "$($resourceGroupName[0])*$($resourceGroupName.Substring(2, $resourceGroupName.Length - 4))*$($resourceGroupName.Substring($resourceGroupName.Length - 1))"
+        $rg = dir $rgNameWild -Force       
         $rg.Count | Should Be 1
         
         # Indicates that this is a DirectoryType object        
         $rg.SubscriptionId | Should not BeNullOrEmpty
-        $rg.ResourceGroupName | Should Be 'AzurePSDrive.Test'
-        $rg.Name | Should Be 'AzurePSDrive.Test'
+        $rg.ResourceGroupName | Should Be $resourceGroupName
+        $rg.Name | Should Be $resourceGroupName
         $rg.Location | Should Be 'westus'
         $rg.ProvisioningState | Should Be 'Succeeded'
     }
 
     It "Retrieving a ResourceGroup in the subscription using wildcard in name" {
-        $rg = dir A*urePSDrive.Te*t           
+        $rgNameWild = "$($resourceGroupName[0])*$($resourceGroupName.Substring(2, $resourceGroupName.Length - 4))*$($resourceGroupName.Substring($resourceGroupName.Length - 1))"
+        $rg = dir $rgNameWild
         $rg.Count | Should Be 1
         
         # Indicates that this is a DirectoryType object
         $rg.SSItemMode | Should Be '+'
         $rg.PSDrive | Should Be 'Azure'
         $rg.SubscriptionId | Should not BeNullOrEmpty
-        $rg.ResourceGroupName | Should Be 'AzurePSDrive.Test'
-        $rg.Name | Should Be 'AzurePSDrive.Test'
+        $rg.ResourceGroupName | Should Be $resourceGroupName
+        $rg.Name | Should Be $resourceGroupName
         $rg.Location | Should Be 'westus'
         $rg.ProvisioningState | Should Be 'Succeeded'
     }
@@ -212,16 +215,18 @@ Describe Get-ResourceGroup {
     It "Using server supported ODataQuery Filter parameter in ResourceGroup" {
         # BUG: Using -Force in when retrieving OData filtered ResourceGroups results in an error
         # Using -Filter results in using ODataQuery based server-side filterring
-        $rg = dir -Filter AzurePSDrive*
+        $rgNameWild = "$($resourceGroupName.Substring(0, $resourceGroupName.Length - 5))*"
+        $rg = dir -Filter $rgNameWild
 
         # Only one ResourceGroup corresponding to specified Filter must be returned      
         $rg.Count | Should Be 1
-        $rg.Name | Should Be 'AzurePSDrive.Test'
+        $rg.Name | Should Be $resourceGroupName
         
     }
 
     It "Using non-existant Filter in ResourceGroup" {
-        $rg = dir -Filter AurePS*
+        $rgNameWild = "$($resourceGroupName[0])$($resourceGroupName[2])$($resourceGroupName[3])$($resourceGroupName[5])*"
+        $rg = dir -Filter $rgNameWild
 
         # None must be returned since supplied filter is non-existant     
         $rg | Should BeNullOrEmpty
@@ -238,7 +243,7 @@ Describe Get-ResourceGroup {
 #region Get-ResourceProvider Tests
 Describe Get-ResourceProvider {
     BeforeAll {
-        cd "Azure:\$subscriptionName\ResourceGroups\AzurePSDrive.Test"
+        cd "Azure:\$subscriptionName\ResourceGroups\$resourceGroupName"
     }
 
     It "Retrieving ResourceProviders in the ResourceGroup" {
@@ -305,7 +310,7 @@ Describe Get-ResourceType {
     It "Retrieving ResourceTypes in the ResourceType with and without Force switch" {
 
         # Verify Compute Type
-        cd "Azure:\$subscriptionName\ResourceGroups\AzurePSDrive.Test\Microsoft.Compute"
+        cd "Azure:\$subscriptionName\ResourceGroups\$resourceGroupName\Microsoft.Compute"
         $resourceTypes = dir               
         $resourceTypes.Count | Should Be 2
 
@@ -320,7 +325,7 @@ Describe Get-ResourceType {
         $diff | Should BeNullOrEmpty        
         
         # Verify Network Type
-        cd "Azure:\$subscriptionName\ResourceGroups\AzurePSDrive.Test\Microsoft.Network"
+        cd "Azure:\$subscriptionName\ResourceGroups\$resourceGroupName\Microsoft.Network"
         $resourceTypes = dir -Force              
         $resourceTypes.Count | Should Be 3
 
@@ -352,7 +357,7 @@ Describe Get-ResourceType {
     It "Using Filter parameter in ResourceType with Force switch" {
             
         # Verify Storage Type
-        cd "Azure:\$subscriptionName\ResourceGroups\AzurePSDrive.Test\Microsoft.Storage"
+        cd "Azure:\$subscriptionName\ResourceGroups\$resourceGroupName\Microsoft.Storage"
         $resourceType = dir -Filter *Storage* -Force
 
         # Only one ResourceType corresponding to specified Filter must be returned      
@@ -387,7 +392,7 @@ Describe Get-SpecificRMResourceType {
 
     It "Retrieving VM type using the Provider" {
 
-        cd "Azure:\$subscriptionName\ResourceGroups\AzurePSDrive.Test\Microsoft.Compute\virtualMachines"
+        cd "Azure:\$subscriptionName\ResourceGroups\$resourceGroupName\Microsoft.Compute\virtualMachines"
 
         $vm = dir
 
@@ -406,7 +411,7 @@ Describe Get-SpecificRMResourceType {
 
     It "Retrieving Network type using the Provider" {
 
-        cd "Azure:\$subscriptionName\ResourceGroups\AzurePSDrive.Test\Microsoft.Network\networkInterfaces"
+        cd "Azure:\$subscriptionName\ResourceGroups\$resourceGroupName\Microsoft.Network\networkInterfaces"
 
         $network = dir
 
@@ -430,7 +435,7 @@ Describe Get-SpecificRMResourceType {
 
       It "Retrieving Storage type using the Provider" {
 
-        cd "Azure:\$subscriptionName\ResourceGroups\AzurePSDrive.Test\Microsoft.Storage\storageAccounts"
+        cd "Azure:\$subscriptionName\ResourceGroups\$resourceGroupName\Microsoft.Storage\storageAccounts"
         $storage = dir
 
         # Validate all properties - Ensure they match the ones used during resource creation        
@@ -462,16 +467,15 @@ Describe Get-SpecificRMResourceType {
 #region Get-AllResources with Recurse functionality Tests
 Describe Get-AllResourcesWithRecurse {
     BeforeAll {     
-       cd "Azure:\$subscriptionName\ResourceGroups\AzurePSDrive.Test"
+       cd "Azure:\$subscriptionName\ResourceGroups\$resourceGroupName"
     }
 
     It "Retrieving all resources with Recurse switch from ResourceGroup top level" {
 
         $allResources = dir -Recurse -Force
-
-        # There are 16 resources deployed in Azure as part of 'Initialize-AzureTestResource'
+        # There are 15 resources deployed in Azure as part of 'Initialize-AzureTestResource'
         # This includes Storage, Network, Compute resources
-        $allResources.Count | Should Be 16       
+        $allResources.Count | Should Be 15
         
     }    
     
@@ -505,8 +509,8 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
         cd "Azure:\$subscriptionName\AllResources"
         $a = dir
 
-        # We have a lot of items. Choose 10 here, a random number to ensure it is not 0
-        $a.Count | Should BeGreaterThan 10
+        # Ensure it is not 0
+        $a.Count | Should BeGreaterThan 1
     }
     
     It "Retrieving all VirtualMachines" {
@@ -514,8 +518,8 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
         
         $a = dir
 
-        # We have a lot of items. Choose 10 here, a random number to ensure it is not 0
-        $a.Count | Should BeGreaterThan 10    
+        # Ensure it is not 0
+        $a.Count | Should BeGreaterThan 1    
     }    
     
     It "Retrieving all StorageAccounts" {
@@ -524,10 +528,10 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
         # shipsazurermtest is azurepsdriveteststorage, AzurePSDrive.Test is resourcegroup
         $a = dir
 
-        # We have a lot of items. Choose 10 here, a random number to ensure it is not 0
-        $a.Count | Should BeGreaterThan 10   
+        # Ensure it is not 0
+        $a.Count | Should BeGreaterThan 1   
         
-        cd .\azurepsdriveteststorage\
+        cd .\$storageAccountName\
         
         $b=dir
         $b | ?{ $_.name -eq "Blobs" } | should not BeNullOrEmpty  
@@ -541,23 +545,19 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
 
         cd vhds
         $d=dir
-        $d | Should  Not BeNullOrEmpty
+        $d | Should Not BeNullOrEmpty
 
-        cd "Azure:\$subscriptionName\StorageAccounts\azurepsdriveteststorage\Files"
+        cd "Azure:\$subscriptionName\StorageAccounts\$storageAccountName\Files"
         $e=dir
-        $e | ?{ $_.name -eq "foo" } | should not BeNullOrEmpty  
-       
-        cd foo
-        $f=dir
-        $f | Should Not BeNullOrEmpty
+        $e | Should BeNullOrEmpty
 
-        cd "Azure:\$subscriptionName\StorageAccounts\azurepsdriveteststorage\Tables"
+        cd "Azure:\$subscriptionName\StorageAccounts\$storageAccountName\Tables"
         $g=dir
-        $g | Should Not BeNullOrEmpty
+        $g | Should BeNullOrEmpty
 
-        cd "Azure:\$subscriptionName\StorageAccounts\azurepsdriveteststorage\Queues"
+        cd "Azure:\$subscriptionName\StorageAccounts\$storageAccountName\Queues"
         $h=dir
-        $h | Should Not BeNullOrEmpty 
+        $h | Should BeNullOrEmpty
     } 
      
     AfterAll {

@@ -68,6 +68,6 @@ Write-Output "Import AzurePSDrive module to current session"
 Import-Module (Join-Path $azurePSDrivePath 'azurepsdrive.psd1') -Force -Verbose
 
 Write-Output "Invoke AzurePSDrive Tests"
-Invoke-AzurePSDriveTests
+Invoke-AzurePSDriveTests $subscriptionName
 
 [Console]::Beep(2000, 300);[Console]::Beep(2000, 300);[Console]::Beep(2000, 300)
