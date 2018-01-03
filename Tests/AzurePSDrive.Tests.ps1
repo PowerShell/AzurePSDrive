@@ -559,7 +559,7 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
 
         cd "Azure:\$subscriptionName\StorageAccounts\$storageAccountName\Files"
         $e=dir
-        $e | Should Not BeNullOrEmpty
+        $e | Should BeNullOrEmpty
 
         cd "Azure:\$subscriptionName\StorageAccounts\$storageAccountName\Tables"
         $g=dir
