@@ -10,9 +10,9 @@ param (
 function New-PartialGuidForName { ([guid]::NewGuid().ToString() -replace '-','')[0..9] -join '' }
 
 #region Script variables
-$resourceGroupName = "apsdt$(New-PartialGuidForName)"
+$resourceGroupName = "rgapsdt$(New-PartialGuidForName)"
 $location = 'WestUS'
-$storageAccountName = "apsdt$(New-PartialGuidForName)"
+$storageAccountName = "saapsdt$(New-PartialGuidForName)"
 $skuName = 'Standard_LRS'
 $interfaceName = 'TestInterface'
 $subnetName = 'TestSubnet1'
@@ -54,6 +54,7 @@ function New-AzureDrive
 # One time setup in Azure
 function Initialize-AzureTestResource
 {    
+    Write-Verbose "Creating the resources used by the tests..."
     # ResourceGroup
     $rg = AzureRM.Resources\Get-AzureRmResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
     if ($rg -eq $null)
@@ -62,10 +63,10 @@ function Initialize-AzureTestResource
     }
 
     #Storage
-    $storage = AzureRM.Storage\Get-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $rg.ResourceGroupName -ErrorAction SilentlyContinue
+    $storage = AzureRM.Storage\Get-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $resourceGroupName -ErrorAction SilentlyContinue
     if ($storage -eq $null)
     {
-        $storage = AzureRM.Storage\New-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $rg.ResourceGroupName -Location $location -SkuName $skuName -Verbose
+        $storage = AzureRM.Storage\New-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $resourceGroupName -Location $location -SkuName $skuName -Verbose
     }
 
     #Network
@@ -94,7 +95,22 @@ function Initialize-AzureTestResource
         #Create the VM in Azure
         AzureRM.Compute\New-AzureRmVM -ResourceGroupName $resourceGroupName -Location $location -VM $virtualMachine
     }
+    Write-Verbose "Resources created."
+}
+#endregion
 
+# Remove ResourceGroup and other Azure deployments
+# One time teardown in Azure
+function Remove-AzureTestResource
+{
+    Write-Verbose "Deleting the resources used by the tests..."
+    # ResourceGroup
+    $rg = AzureRM.Resources\Get-AzureRmResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
+    if ($rg -ne $null)
+    {
+        $rg | AzureRM.Resources\Remove-AzureRmResourceGroup -Force
+    }
+    Write-Verbose "Resources deleted."
 }
 #endregion
 
@@ -162,7 +178,6 @@ Describe Get-Subscription {
         Set-Location $PSScriptRoot
     }
 }
-
 #endregion
 
 #region Get-ResourceGroup Tests
@@ -237,7 +252,6 @@ Describe Get-ResourceGroup {
         Set-Location $PSScriptRoot
     }
 }
-
 #endregion
 
 #region Get-ResourceProvider Tests
@@ -299,7 +313,6 @@ Describe Get-ResourceProvider {
         Set-Location $PSScriptRoot
     }
 }
-
 #endregion
 
 #region Get-ResourceType Tests
@@ -381,7 +394,6 @@ Describe Get-ResourceType {
         Set-Location $PSScriptRoot
     }
 }
-
 #endregion
 
 #region Get-SpecificRMResourceType Tests
@@ -461,7 +473,6 @@ Describe Get-SpecificRMResourceType {
         Set-Location $PSScriptRoot
     }
 }
-
 #endregion
 
 #region Get-AllResources with Recurse functionality Tests
@@ -483,7 +494,6 @@ Describe Get-AllResourcesWithRecurse {
         Set-Location $PSScriptRoot
     }
 }
-
 #endregion
 
 #region AllResources, VMs, StorageAccounts, and Webapps tests
@@ -510,7 +520,7 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
         $a = dir
 
         # Ensure it is not 0
-        $a.Count | Should BeGreaterThan 1
+        $a.Count | Should Not Be 0
     }
     
     It "Retrieving all VirtualMachines" {
@@ -519,7 +529,7 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
         $a = dir
 
         # Ensure it is not 0
-        $a.Count | Should BeGreaterThan 1    
+        $a.Count | Should Not Be 0
     }    
     
     It "Retrieving all StorageAccounts" {
@@ -529,7 +539,7 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
         $a = dir
 
         # Ensure it is not 0
-        $a.Count | Should BeGreaterThan 1   
+        $a.Count | Should Not Be 0
         
         cd .\$storageAccountName\
         
@@ -564,5 +574,6 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
         Set-Location $PSScriptRoot
     }
 }
-
 #endregion
+
+Remove-AzureTestResource

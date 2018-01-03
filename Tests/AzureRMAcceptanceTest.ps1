@@ -32,11 +32,6 @@ if (-not ($env:azureADAppId -and $env:azurePassword-and $env:azureTenantId))
 ## Install your version of AzureRM modules - specifically AzureRM.Resources, AzureRM.Profile, AzureRM.Compute, AzureRM.Network, AzureRM.Storage
 Write-Output "Ensure AzureRM.Resources, AzureRM.Profile, AzureRM.Compute, AzureRM.Network, AzureRM.Storage modules are installed"
 
-# $azurePSDrivePath = (Join-Path $env:USERPROFILE 'AzurePSDrive')
-# Write-Output "Clone AzurePSDrive Repo to '$azurePSDrivePath'"
-# git clone https://github.com/PowerShell/AzurePSDrive.git -b development $azurePSDrivePath
-$azurePSDrivePath = "$PSScriptRoot\.."
-
 Write-Output "Update PowerShellGet"
 # Update PowerShellGet otherwise you will get an error 
 # "Cannot process argument transformation on parameter 'InstalledModuleInfo'. Cannot convert the "System.Object[]" 
@@ -57,6 +52,8 @@ Import-Module AzureRM.Network -Force -Verbose
 Import-Module AzureRM.Storage -Force -Verbose
 Import-Module SHiPS -Force -Verbose
 AzureRM.Profile\Disable-AzureRmDataCollection
+
+$azurePSDrivePath = "$PSScriptRoot\.."
 
 Write-Host "Import the test wrapper for AzurePSDrive"
 Import-Module (Join-Path $azurePSDrivePath 'tests\test.psm1') -Force -Verbose
