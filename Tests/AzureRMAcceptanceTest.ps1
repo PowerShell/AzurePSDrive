@@ -45,11 +45,11 @@ try {
     Install-Module -Name SHiPS -Verbose -Repository PSGallery
 
     Write-Output "Import required modules to current session"
-    Import-Module AzureRM.Resources -Force -Verbose
     Import-Module AzureRM.Profile -Force -Verbose
+    Import-Module AzureRM.Storage -Force -Verbose
+    Import-Module AzureRM.Resources -Force -Verbose
     Import-Module AzureRM.Compute -Force -Verbose
     Import-Module AzureRM.Network -Force -Verbose
-    Import-Module AzureRM.Storage -Force -Verbose
     Import-Module SHiPS -Force -Verbose
     AzureRM.Profile\Disable-AzureRmDataCollection
 
