@@ -296,7 +296,7 @@ Describe Get-ResourceProvider {
         $provider = dir -Filter *Compute* -Force
 
         # Only one ResourceGroup corresponding to specified Filter must be returned      
-        $provider.Count | Should Be 2
+        $provider.Count | Should Be 1
         $provider.Name | Should Be 'Microsoft.Compute'
         
     }
@@ -559,7 +559,7 @@ Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
 
         cd "Azure:\$subscriptionName\StorageAccounts\$storageAccountName\Files"
         $e=dir
-        $e | Should Not BeNullOrEmpty
+        $e | Should BeNullOrEmpty
 
         cd "Azure:\$subscriptionName\StorageAccounts\$storageAccountName\Tables"
         $g=dir
