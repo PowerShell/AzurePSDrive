@@ -340,7 +340,7 @@ Describe Get-ResourceType {
         # Verify Network Type
         cd "Azure:\$subscriptionName\ResourceGroups\$resourceGroupName\Microsoft.Network"
         $resourceTypes = dir -Force              
-        $resourceTypes.Count | Should Be 3
+        $resourceTypes.Count | Should Be 4
 
         # Only following resourceTypes must be returned, since we initialized only these in 'Initialize-AzureTestResource'
         $expected = @('networkInterfaces', 'publicIPAddresses', 'virtualNetworks')
@@ -484,9 +484,9 @@ Describe Get-AllResourcesWithRecurse {
     It "Retrieving all resources with Recurse switch from ResourceGroup top level" {
 
         $allResources = dir -Recurse -Force
-        # There are 15 resources deployed in Azure as part of 'Initialize-AzureTestResource'
+        # There are 41 resources deployed in Azure as part of 'Initialize-AzureTestResource'
         # This includes Storage, Network, Compute resources
-        $allResources.Count | Should Be 15
+        $allResources.Count | Should Be 41
         
     }    
     
