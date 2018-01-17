@@ -343,7 +343,7 @@ Describe Get-ResourceType {
         $resourceTypes.Count | Should Be 3
 
         # Only following resourceTypes must be returned, since we initialized only these in 'Initialize-AzureTestResource'
-        $expected = @('networkInterfaces', 'publicIPAddresses', 'virtualNetworks', 'networkSecurityGroups')
+        $expected = @('networkInterfaces', 'publicIPAddresses', 'virtualNetworks')
         $actual = @()
         foreach ($resourceType in $resourceTypes)
         {
