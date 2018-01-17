@@ -490,9 +490,10 @@ Describe Get-AllResourcesWithRecurse {
     It "Retrieving all resources with Recurse switch from ResourceGroup top level" {
 
         $allResources = dir -Recurse -Force
-        # There are 15 resources deployed in Azure as part of 'Initialize-AzureTestResource'
+        # There are resources deployed in Azure as part of 'Initialize-AzureTestResource'
         # This includes Storage, Network, Compute resources
-        $allResources.Count | Should Be 15
+        # Depending on the subscription this number varies, but min is 5 since we are deploying atleast one of each
+        $allResources.Count | Should BeGreaterThan 5
         
     }    
     
