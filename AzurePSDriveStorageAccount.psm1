@@ -1,6 +1,6 @@
 ﻿using namespace Microsoft.PowerShell.SHiPS
 
-$script:Azure_Storage = if($IsCoreCLR){'AzureRM.Storage.NetCore'}else{'Azure.Storage'}
+$script:Azure_Storage = if($IsCoreCLR){'Azure.Storage.NetCore'}else{'Azure.Storage'}
 $script:AzureRM_Storage = if($IsCoreCLR){'AzureRM.Storage.NetCore'}else{'AzureRM.Storage'}
 
 
