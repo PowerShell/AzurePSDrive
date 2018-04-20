@@ -1,4 +1,4 @@
-8﻿#
+#
 # Module manifest for module 'AzurePSDrive'
 #
 
