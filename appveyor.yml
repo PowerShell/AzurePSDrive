@@ -5,9 +5,9 @@ environment:
   - APPVEYOR_BUILD_WORKER_IMAGE: WMF 5
     PowerShellEdition: Desktop
   azureADAppId:
-    secure: 6ba+OxaNOynnaHdOojrzlEyj3I6EfSUXC5yaDXB51SiiyuCmij+gLUpEj/1Peyde
+    secure: DVUQm3GqcGogIWadSCh6foNg69MQ0Ty4HKTunQi/9ytEPXPWr/geJKhQe7Cgleql
   azurePassword:
-    secure: wJ7g62CzQMC5E8qcSGk4eg==
+    secure: w6XhMAypOA7cFbmGn8Dl6qCP5UDtknqvRwj6R81wpjZoC6npo4hGHuR0//SAUF32
   azureTenantId:
     secure: vWkkrxzokM51lLgu89CeWCl9tTQVsP0aiuVWXAdSLuGWlxnqlmmfzhWAGubEKtY4
 
