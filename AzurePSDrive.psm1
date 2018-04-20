@@ -6,6 +6,8 @@ using module .\AzurePSDriveWebApp.psm1
 
 $script:AzureRM_Profile = if($IsCoreCLR){'AzureRM.Profile.NetCore'}else{'AzureRM.Profile'}
 $script:AzureRM_Resources = if($IsCoreCLR){'AzureRM.Resources.Netcore'}else{'AzureRM.Resources'}
+$script:pathPattern = [System.IO.Path]::Combine('Azure:', '*', 'ResourceGroups', '*')
+$script:pathSeparator = if([System.IO.Path]::DirectorySeparatorChar -eq '\'){'\\'}else{'/'}
 
 # Ensure Session is logged-on to access Azure resources
 $context = (& "$script:AzureRM_Profile\Get-AzureRmContext")
@@ -15,7 +17,7 @@ if ([string]::IsNullOrEmpty($($context.Account)))
 }
 
 # Automatically pick resource group when inside resourcegroups of Azure drive
-$Global:PSDefaultParameterValues['*-AzureRM*:ResourceGroupName'] = {if($pwd -like 'Azure:\*\ResourceGroups\*'){($pwd -split '\\')[3]}}
+$Global:PSDefaultParameterValues['*-AzureRM*:ResourceGroupName'] = {if($pwd -like $script:pathPattern){($pwd -split $script:pathSeparator)[3]}}
 
 [SHiPSProvider(UseCache=$true)]
 class Azure : SHiPSDirectory
