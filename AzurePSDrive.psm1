@@ -124,16 +124,9 @@ class ResourceGroups : SHiPSDirectory
         $obj =  @()
         $subId = $this.SubscriptionId
 
-        $azureRMResourceParams = @{'ResourceId'="/subscriptions/$subId/resourceGroups"}
-
-        if ($this.ProviderContext.Filter)
-        {
-            $azureRMResourceParams += @{'ODataQuery'=(Get-ODataQueryFilter -filter if($this.ProviderContext.Filter))}
-        }
-
-        @(& "$script:AzureRM_Resources\Get-AzureRmResource" @azureRMResourceParams).Foreach{
+        @(& "$script:AzureRM_Resources\Get-AzureRmResourceGroup").Foreach{
              
-            $obj +=  [ResourceGroup]::new($subId, $_.Name, $_.Location, $_.Properties.ProvisioningState);                  
+            $obj +=  [ResourceGroup]::new($subId, $_.ResourceGroupName, $_.Location, $_.ProvisioningState);                  
         }
 
         return $obj;
