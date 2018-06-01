@@ -9,13 +9,6 @@ $script:AzureRM_Resources = if($IsCoreCLR){'AzureRM.Resources.Netcore'}else{'Azu
 $script:pathPattern = [System.IO.Path]::Combine('Azure:', '*', 'ResourceGroups', '*')
 $script:pathSeparator = if([System.IO.Path]::DirectorySeparatorChar -eq '\'){'\\'}else{'/'}
 
-# Ensure Session is logged-on to access Azure resources
-$context = (& "$script:AzureRM_Profile\Get-AzureRmContext")
-if ([string]::IsNullOrEmpty($($context.Account)))
-{
-    throw "Ensure that session has access to Azure resources - use $script:AzureRM_Profile\Add-AzureRMAccount or $script:AzureRM_Profile\Login-AzureRMAccount"
-}
-
 # Automatically pick resource group when inside resourcegroups of Azure drive
 $Global:PSDefaultParameterValues['*-AzureRM*:ResourceGroupName'] = {if($pwd -like $script:pathPattern){($pwd -split $script:pathSeparator)[3]}}
 
@@ -24,6 +17,13 @@ class Azure : SHiPSDirectory
 {
     Azure([string]$name): base($name)
     {        
+        # Ensure Session is logged-on to access Azure resources
+        # This is done in the constructor so that it is a runtime check and not done during module import.
+        $context = (& "$script:AzureRM_Profile\Get-AzureRmContext")
+        if ([string]::IsNullOrEmpty($($context.Account)))
+        {
+            throw "Ensure that session has access to Azure resources - use $script:AzureRM_Profile\Add-AzureRMAccount or $script:AzureRM_Profile\Login-AzureRMAccount"
+        }
     } 
 
     [object[]] GetChildItem()
