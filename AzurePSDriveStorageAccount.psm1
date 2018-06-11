@@ -38,52 +38,73 @@ class StorageAccount : SHiPSDirectory
     [object[]] GetChildItem()
     {        
         $obj =  @()
-
         $ev = $null
-        try{
+        if ($this.data.PrimaryEndpoints.Blob -ne $null)
+        {
+            try
+            {
                 $result=& "$script:Azure_Storage\Get-AzureStorageContainer" -Context $this.data.Context -ErrorAction SilentlyContinue -ErrorVariable ev
                 if($ev) {
                     Write-Verbose $ev.Exception
                 }else{
                     $obj+=[Blobs]::new($this.data, $result);
                 }
-            } catch {
+            }
+            catch
+            {
                 Write-Verbose $_.Exception
             }
-        try{
+        }
+
+        if ($this.data.PrimaryEndpoints.File -ne $null)
+        {
+            try
+            {
                 $result=& "$script:Azure_Storage\Get-AzureStorageShare" -Context $this.data.Context -ErrorAction SilentlyContinue -ErrorVariable ev
-                if($ev) {
+                if ($ev) {
                     Write-Verbose $ev.Exception
                 } else {
                     $obj+=[Files]::new($this.data, $result)
-        
                 }
-         } catch {
+            }
+            catch
+            {
                 Write-Verbose $_.Exception
-         }
-            
-        try {
+            }
+        }
+
+        if ($this.data.PrimaryEndpoints.Table -ne $null)
+        {
+            try
+            {
                 $result=& "$script:Azure_Storage\Get-AzureStorageTable" -Context $this.data.Context  -ErrorAction SilentlyContinue -ErrorVariable ev
-                if($ev){
+                if ($ev){
                     Write-Verbose $ev.Exception 
                 } else {
                     $obj+=[Tables]::new($this.data, $result);
                 }
-        } catch {
+            }
+            catch
+            {
                 Write-Verbose $_.Exception
+            }
         }
 
-        try {
-            $result=& "$script:Azure_Storage\Get-AzureStorageQueue" -Context $this.data.Context -ErrorAction SilentlyContinue -ErrorVariable ev
-            if($ev){
-                Write-Verbose $ev.Exception
-            } else {                    
-                $obj+=[Queues]::new($this.data, $result);
-            }    
-        }
-         catch {
+        if ($this.data.PrimaryEndpoints.Queue -ne $null)
+        {
+            try {
+                $result=& "$script:Azure_Storage\Get-AzureStorageQueue" -Context $this.data.Context -ErrorAction SilentlyContinue -ErrorVariable ev
+                if ($ev) {
+                    Write-Verbose $ev.Exception
+                } else {
+                    $obj+=[Queues]::new($this.data, $result);
+                }
+            }
+            catch
+            {
                 Write-Verbose $_.Exception
-         }
+            }
+        }
 
         return $obj;
     }
