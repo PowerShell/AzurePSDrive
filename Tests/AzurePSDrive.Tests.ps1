@@ -33,15 +33,19 @@ $osDiskName = $VMName + "OSDisk"
 #endregion
 
 #region Utility
-# load all required dependencies
-function Initialize-Dependencies
+# Verify that dependent modules required by the test are available in current session
+function Test-Dependency
 {
-    $dependentModules = @($script:AzureRM_Profile, $script:AzureRM_Resources, $script:AzureRM_Compute, $script:AzureRM_Network, $script:AzureRM_Storage, 'SHiPS', 'AzurePSDrive')
-
-    foreach($dependentModule in $dependentModules)
+    if ((-not (Get-Module -Name $script:AzureRM_Profile)) `
+    -or (-not (Get-Module -Name $script:AzureRM_Resources)) `
+    -or (-not (Get-Module -Name $script:AzureRM_Compute)) `
+    -or (-not (Get-Module -Name $script:AzureRM_Network)) `
+    -or (-not (Get-Module -Name $script:AzureRM_Storage)) `
+    -or (-not (Get-Module -Name SHiPS)) `
+    -or (-not (Get-Module -Name AzurePSDrive)))
     {
-        Import-Module -Name $dependentModule -ErrorAction Stop
-    }    
+        throw "Ensure $script:AzureRM_Profile, $script:AzureRM_Resources, $script:AzureRM_Compute, $script:AzureRM_Network, $script:AzureRM_Storage, SHiPS, AzurePSDrive modules are installed"
+    }
 }
 
 # Create AzurePSDrive PowerShell Drive
@@ -118,7 +122,8 @@ function Remove-AzureTestResource
 
 #region Test Suite Initialization
 cd $PSScriptRoot
-Initialize-Dependencies
+Initialize-TestEnvironment
+Test-Dependency
 Initialize-AzureTestResource
 New-AzureDrive
 #endregion

@@ -1,5 +1,11 @@
 $PSScriptRoot = $MyInvocation.MyCommand.Path
 
+$script:AzureRM_Profile = if($IsCoreCLR){'AzureRM.Profile.NetCore'}else{'AzureRM.Profile'}
+$script:AzureRM_Resources = if($IsCoreCLR){'AzureRM.Resources.Netcore'}else{'AzureRM.Resources'}
+$script:AzureRM_Compute = if($IsCoreCLR){'AzureRM.Compute.NetCore'}else{'AzureRM.Compute'}
+$script:AzureRM_Network = if($IsCoreCLR){'AzureRM.Network.NetCore'}else{'AzureRM.Network'}
+$script:AzureRM_Storage = if($IsCoreCLR){'AzureRM.Storage.NetCore'}else{'AzureRM.Storage'}
+
 function Invoke-AzurePSDriveTests([string]$subscriptionName = 'AutomationTeam')
 {
     $testResultsFile = Microsoft.PowerShell.Management\Join-Path -Path $PSScriptRoot -ChildPath 'AzurePSDrive.TestResults.xml'
@@ -33,55 +39,56 @@ function Initialize-TestEnvironment
 {
     Install-PackageProvider NuGet -Force
 
-    $dependencyInstalled = (Get-Module -li AzureRM.Resources | ForEach-Object Version) -ge [version]"4.2"
+    $dependencyInstalled = (Get-Module -Name $script:AzureRM_Profile -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Save-Module -Name AzureRM.Resources -MinimumVersion 4.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+        Install-Module -Name $script:AzureRM_Profile -ErrorAction Stop
     }
 
-    $dependencyInstalled = (Get-Module -li AzureRM.Profile | ForEach-Object Version) -ge [version]"3.2"
+    $dependencyInstalled = (Get-Module -Name $script:AzureRM_Resources -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Save-Module -Name AzureRM.Profile -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+        Install-Module -Name $script:AzureRM_Resources -ErrorAction Stop
     }
 
-    $dependencyInstalled = (Get-Module -li AzureRM.Compute | ForEach-Object Version) -ge [version]"3.2"
+    $dependencyInstalled = (Get-Module -Name $script:AzureRM_Compute -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Save-Module -Name AzureRM.Compute -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+        Install-Module -Name $script:AzureRM_Compute -ErrorAction Stop
     }
 
-    $dependencyInstalled = (Get-Module -li AzureRM.Network | ForEach-Object Version) -ge [version]"4.2"
+    $dependencyInstalled = (Get-Module -Name $script:AzureRM_Network -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Save-Module -Name AzureRM.Network -MinimumVersion 4.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+        Install-Module -Name $script:AzureRM_Network -ErrorAction Stop
     }
 
-    $dependencyInstalled = (Get-Module -li AzureRM.Storage | ForEach-Object Version) -ge [version]"3.2"
+    $dependencyInstalled = (Get-Module -Name $script:AzureRM_Storage -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Save-Module -Name AzureRM.Storage -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+        Install-Module -Name $script:AzureRM_Storage -ErrorAction Stop
     }
 
-    $SHiPSInstalled = Get-Module -li -Name SHiPS 
-    if (-not $SHiPSInstalled)
+    $dependencyInstalled = (Get-Module -Name SHiPS -ListAvailable )
+    if (-not $dependencyInstalled)
     {
-        Save-Module -Name SHiPS -Force -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
-    }
-    
-    $AzurePSDriveInstalled = Get-Module -li -Name AzurePSDrive 
-    if (-not $AzurePSDriveInstalled)
-    {
-        Save-Module -Name AzurePSDrive -Force -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+        Install-Module -Name SHiPS -ErrorAction Stop
     }
 
-    Import-Module AzureRM.Resources -Force -Verbose
-    Import-Module AzureRM.Profile -Force -Verbose
-    Import-Module AzureRM.Compute -Force -Verbose
-    Import-Module AzureRM.Network -Force -Verbose
-    Import-Module AzureRM.Storage -Force -Verbose
-    Import-Module SHiPS -Force -Verbose
-    AzureRM.Profile\Disable-AzureRmDataCollection
+    $dependencyInstalled = (Get-Module -Name AzurePSDrive -ListAvailable )
+    if (-not $dependencyInstalled)
+    {
+        Install-Module -Name AzurePSDrive -ErrorAction Stop
+    }
+
+    $dependentModules = @($script:AzureRM_Profile, $script:AzureRM_Resources, $script:AzureRM_Compute, $script:AzureRM_Network, $script:AzureRM_Storage, 'SHiPS', 'AzurePSDrive')
+
+    foreach($dependentModule in $dependentModules)
+    {
+        Import-Module -Name $dependentModule -ErrorAction Stop
+    }
+
+    & $script:AzureRM_Profile\Disable-AzureRmDataCollection
 }
 
 # Login to AzureRM using Service Principal
@@ -97,5 +104,5 @@ function Login-AzureRM
     $secureString = ConvertTo-SecureString -String $password -AsPlainText -Force
     $cred = New-Object System.Management.Automation.PSCredential($azureAdAppId, $secureString)
 
-    AzureRM.Profile\Login-AzureRmAccount -ServicePrincipal -Credential $cred -TenantId $tenantId -Verbose -ErrorAction Stop
+    & $script:AzureRM_Profile\Login-AzureRmAccount -ServicePrincipal -Credential $cred -TenantId $tenantId -Verbose -ErrorAction Stop
 }
