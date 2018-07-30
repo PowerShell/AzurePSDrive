@@ -36,7 +36,7 @@ test_script:
         # Update PowerShellGet otherwise you will get an error 
         # "Cannot process argument transformation on parameter 'InstalledModuleInfo'. Cannot convert the "System.Object[]" 
         # value of type "System.Object[]" to type System.Management.Automation.PSModuleInfo"
-        PowerShell -command 'Install-PackageProvider NuGet -Force -ForceBootstrap; Install-Module -Name PowerShellGet -Force -AllowClobber'
+        # PowerShell -command 'Install-PackageProvider NuGet -Force -ForceBootstrap; Install-Module -Name PowerShellGet -Force -AllowClobber'
 
         Write-Host "Import the test wrapper for AzurePSDrive"
         Import-Module c:\projects\azurepsdrive\tests\test.psm1 -Force -Verbose
