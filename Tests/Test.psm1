@@ -37,8 +37,6 @@ function Publish-AzurePSDriveTestResults
 # Ensure all Test dependencies are installed on the machine
 function Initialize-TestEnvironment
 {
-    Install-PackageProvider NuGet -Force
-
     $dependencyInstalled = (Get-Module -Name $script:AzureRM_Profile -ListAvailable)
     if (-not $dependencyInstalled)
     {

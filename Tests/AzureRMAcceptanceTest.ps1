@@ -39,11 +39,16 @@ try {
     ## Install your version of AzureRM modules
     Write-Output "Ensure $script:AzureRM_Profile, $script:AzureRM_Resources, $script:AzureRM_Compute, $script:AzureRM_Network, $script:AzureRM_Storage modules are installed"
 
-    # Write-Output "Update PowerShellGet"
-    # Update PowerShellGet otherwise you will get an error 
-    # "Cannot process argument transformation on parameter 'InstalledModuleInfo'. Cannot convert the "System.Object[]" 
-    # value of type "System.Object[]" to type System.Management.Automation.PSModuleInfo"
-    # PowerShell -command 'Install-PackageProvider NuGet -Force -ForceBootstrap; Install-Module -Name PowerShellGet -Force -AllowClobber -Repository PSGallery'
+    Write-Output "Bootstrap Nuget"
+    
+    If ($IsCoreCLR)
+    {
+        pwsh -command 'Get-PackageProvider -Name Nuget -ForceBootstrap'
+    }
+    else
+    {
+        PowerShell -command 'Get-PackageProvider -Name Nuget -ForceBootstrap'
+    }
     
     Write-Output "Import required modules to current session"
     Import-Module $script:AzureRM_Profile -Force -ErrorAction Stop
@@ -52,11 +57,12 @@ try {
     Import-Module $script:AzureRM_Network -Force -ErrorAction Stop
     Import-Module $script:AzureRM_Storage -Force -ErrorAction Stop
     & $script:AzureRM_Profile\Disable-AzureRmDataCollection
-
-    $azurePSDrivePath = "$PSScriptRoot\.."
-
-    Write-Host "Import the test wrapper for AzurePSDrive"
-    Import-Module (Join-Path $azurePSDrivePath 'tests\test.psm1') -Force
+        
+    $testModuleRelativePath = Get-ChildItem -Name Test.psm1 -Path $PSScriptRoot -Recurse
+    $testModuleFullPath = (Join-Path $PSScriptRoot $testModuleRelativePath)
+    
+    Write-Host "Import the test wrapper for AzurePSDrive from $testModuleFullPath"
+    Import-Module $testModuleFullPath -Force
 
     Write-Output "Login to Azure Service"
     Login-AzureRM    
