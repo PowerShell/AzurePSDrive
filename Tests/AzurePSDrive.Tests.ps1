@@ -61,7 +61,7 @@ function Initialize-AzureTestResource
     $rg = & $script:AzureRM_Resources\Get-AzureRmResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
     if ($rg -eq $null)
     {
-        $rg = New-AzureRmResourceGroup -Name $resourceGroupName -Location $location -Force -Verbose
+        $rg = & $script:AzureRM_Resources\New-AzureRmResourceGroup -Name $resourceGroupName -Location $location -Force -Verbose
     }
 
     #Storage
@@ -532,7 +532,7 @@ Describe Get-AllResourcesWithRecurse {
 #region AllResources, VMs, StorageAccounts, and Webapps tests
 Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
     BeforeAll {     
-        Disable-AzureRmDataCollection
+        & $script:AzureRM_Profile\Disable-AzureRmDataCollection
         cd "Azure:\$subscriptionName\"
     }
 
