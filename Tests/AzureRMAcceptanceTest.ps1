@@ -53,22 +53,48 @@ try {
     # Set PSGallery Repo to be Trusted to avoid prompt
     Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
     
-    Write-Output "Import required modules to current session"
-    Import-Module $script:AzureRM_Profile -Force -ErrorAction Stop
-    Import-Module $script:AzureRM_Resources -Force -ErrorAction Stop
-    Import-Module $script:AzureRM_Compute -Force -ErrorAction Stop
-    Import-Module $script:AzureRM_Network -Force -ErrorAction Stop
-    Import-Module $script:AzureRM_Storage -Force -ErrorAction Stop
+    Write-Output "Import required modules to current session if not already done"
+    if (-not (Get-Module -Name $script:AzureRM_Profile))
+    {
+        Import-Module $script:AzureRM_Profile -Force -ErrorAction Stop
+    }
+
+    if (-not (Get-Module -Name $script:AzureRM_Resources))
+    {
+        Import-Module $script:AzureRM_Resources -Force -ErrorAction Stop
+    }
+
+    if (-not (Get-Module -Name $script:AzureRM_Compute))
+    {
+        Import-Module $script:AzureRM_Compute -Force -ErrorAction Stop
+    }
+
+    if (-not (Get-Module -Name $script:AzureRM_Network))
+    {
+        Import-Module $script:AzureRM_Network -Force -ErrorAction Stop
+    }
+
+    if (-not (Get-Module -Name $script:AzureRM_Storage))
+    {
+        Import-Module $script:AzureRM_Storage -Force -ErrorAction Stop
+    }
+    
     & $script:AzureRM_Profile\Disable-AzureRmDataCollection
-        
+
     $testModuleRelativePath = Get-ChildItem -Name Test.psm1 -Path $PSScriptRoot -Recurse
     $testModuleFullPath = (Join-Path $PSScriptRoot $testModuleRelativePath)
     
-    Write-Host "Import the test wrapper for AzurePSDrive from $testModuleFullPath"
+    Write-Output "Import the test wrapper for AzurePSDrive from $testModuleFullPath"
     Import-Module $testModuleFullPath -Force
 
     Write-Output "Login to Azure Service"
-    Login-AzureRM    
+    Login-AzureRM
+    
+    $azurePSDriveRelativePath = Get-ChildItem -Name AzurePSDrive.psd1 -Path $PSScriptRoot -Recurse
+    $azurePSDriveFullPath = (Join-Path $PSScriptRoot $azurePSDriveRelativePath)
+    
+    Write-Output "Import AzurePSDrive from $azurePSDriveFullPath"
+    Import-Module $azurePSDriveFullPath -Force
 
     Write-Output "Invoke AzurePSDrive Tests"
     Invoke-AzurePSDriveTests $subscriptionName
@@ -77,7 +103,7 @@ try {
     if($PSItem.Exception.Message -like '*tests failed') {
         Write-Output $PSItem.Exception.Message
     } else {
-        Write-Host "Something went wrong: $PSItem" -ForegroundColor Red
+        Write-Output "Something went wrong: $PSItem" -ForegroundColor Red
         ($PSItem.ScriptStackTrace).Split([Environment]::NewLine) | Where-Object {$_.Length -gt 0} | ForEach-Object { Write-Verbose "`t$_" }
     }
     exit 1
