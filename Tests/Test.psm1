@@ -37,56 +37,75 @@ function Publish-AzurePSDriveTestResults
 # Ensure all Test dependencies are installed on the machine
 function Initialize-TestEnvironment
 {
-    $dependencyInstalled = (Get-Module -ListAvailable $script:AzureRM_Resources | ForEach-Object Version) -ge [version]"4.2"
-    if (-not $dependencyInstalled)
+    if ($IsCoreCLR)
     {
-        Save-Module -Name $script:AzureRM_Resources -MinimumVersion 4.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+        Initialize-TestEnvironmentPSCore
     }
+    else
+    {
+        $dependencyInstalled = (Get-Module -ListAvailable $script:AzureRM_Resources | ForEach-Object Version) -ge [version]"4.2"
+        if (-not $dependencyInstalled)
+        {
+            Save-Module -Name $script:AzureRM_Resources -MinimumVersion 4.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+        }
 
-    $dependencyInstalled = (Get-Module -ListAvailable $script:AzureRM_Profile | ForEach-Object Version) -ge [version]"3.2"
-    if (-not $dependencyInstalled)
-    {
-        Save-Module -Name $script:AzureRM_Profile -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
-    }
+        $dependencyInstalled = (Get-Module -ListAvailable $script:AzureRM_Profile | ForEach-Object Version) -ge [version]"3.2"
+        if (-not $dependencyInstalled)
+        {
+            Save-Module -Name $script:AzureRM_Profile -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+        }
 
-    $dependencyInstalled = (Get-Module -ListAvailable $script:AzureRM_Compute | ForEach-Object Version) -ge [version]"3.2"
-    if (-not $dependencyInstalled)
-    {
-        Save-Module -Name $script:AzureRM_Compute -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
-    }
+        $dependencyInstalled = (Get-Module -ListAvailable $script:AzureRM_Compute | ForEach-Object Version) -ge [version]"3.2"
+        if (-not $dependencyInstalled)
+        {
+            Save-Module -Name $script:AzureRM_Compute -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+        }
 
-    $dependencyInstalled = (Get-Module -ListAvailable $script:AzureRM_Network | ForEach-Object Version) -ge [version]"4.2"
-    if (-not $dependencyInstalled)
-    {
-        Save-Module -Name $script:AzureRM_Network -MinimumVersion 4.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
-    }
+        $dependencyInstalled = (Get-Module -ListAvailable $script:AzureRM_Network | ForEach-Object Version) -ge [version]"4.2"
+        if (-not $dependencyInstalled)
+        {
+            Save-Module -Name $script:AzureRM_Network -MinimumVersion 4.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+        }
 
-    $dependencyInstalled = (Get-Module -ListAvailable $script:AzureRM_Storage | ForEach-Object Version) -ge [version]"3.2"
-    if (-not $dependencyInstalled)
-    {
-        Save-Module -Name $script:AzureRM_Storage -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
-    }
+        $dependencyInstalled = (Get-Module -ListAvailable $script:AzureRM_Storage | ForEach-Object Version) -ge [version]"3.2"
+        if (-not $dependencyInstalled)
+        {
+            Save-Module -Name $script:AzureRM_Storage -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+        }
 
-    $SHiPSInstalled = Get-Module -ListAvailable -Name SHiPS 
-    if (-not $SHiPSInstalled)
-    {
-        Save-Module -Name SHiPS -Force -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
-    }
+        $SHiPSInstalled = Get-Module -ListAvailable -Name SHiPS 
+        if (-not $SHiPSInstalled)
+        {
+            Save-Module -Name SHiPS -Force -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+        }
     
-    $AzurePSDriveInstalled = Get-Module -ListAvailable -Name AzurePSDrive 
-    if (-not $AzurePSDriveInstalled)
-    {
-        Save-Module -Name AzurePSDrive -Force -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+        $AzurePSDriveInstalled = Get-Module -ListAvailable -Name AzurePSDrive 
+        if (-not $AzurePSDriveInstalled)
+        {
+            Save-Module -Name AzurePSDrive -Force -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+        }
+
+        Import-Module -Name $script:AzureRM_Resources -Force -Verbose
+        Import-Module -Name $script:AzureRM_Profile -Force -Verbose
+        Import-Module -Name $script:AzureRM_Compute -Force -Verbose
+        Import-Module -Name $script:AzureRM_Network -Force -Verbose
+        Import-Module -Name $script:AzureRM_Storage -Force -Verbose    
     }
 
-    Import-Module $script:AzureRM_Resources -Force -Verbose
-    Import-Module $script:AzureRM_Profile -Force -Verbose
-    Import-Module $script:AzureRM_Compute -Force -Verbose
-    Import-Module $script:AzureRM_Network -Force -Verbose
-    Import-Module $script:AzureRM_Storage -Force -Verbose
-    Import-Module SHiPS -Force -Verbose
-    AzureRM.Profile\Disable-AzureRmDataCollection
+    Import-Module -Name SHiPS -Force -Verbose
+    & $script:AzureRM_Profile\Disable-AzureRmDataCollection
 }
+
+# Ensure all Test dependencies are installed when using PowerShell Core based environment
+function Initialize-TestEnvironmentPSCore
+{
+    Install-Module -Name $script:AzureRM_Resources -Force -Verbose
+    Install-Module -Name $script:AzureRM_Profile -Force -Verbose
+    Install-Module -Name $script:AzureRM_Compute -Force -Verbose
+    Install-Module -Name $script:AzureRM_Network -Force -Verbose
+    Install-Module -Name $script:AzureRM_Storage -Force -Verbose    
+}
+
 
 # Login to AzureRM using Service Principal
 function Login-AzureRM
