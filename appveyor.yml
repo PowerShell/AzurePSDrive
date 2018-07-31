@@ -32,10 +32,7 @@ build: off
 # Run Pester tests and store the results
 test_script:
     - ps: |
-        Write-Host "Update PowerShellGet"
-        # Update PowerShellGet otherwise you will get an error 
-        # "Cannot process argument transformation on parameter 'InstalledModuleInfo'. Cannot convert the "System.Object[]" 
-        # value of type "System.Object[]" to type System.Management.Automation.PSModuleInfo"
+        Write-Host "Bootstrap Nuget"        
         PowerShell -command 'Get-PackageProvider -Name Nuget -ForceBootstrap'
 
         # Set PSGallery Repo to be Trusted to avoid prompt
