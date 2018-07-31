@@ -78,12 +78,6 @@ function Initialize-TestEnvironment
         {
             Save-Module -Name SHiPS -Force -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
         }
-    
-        $AzurePSDriveInstalled = Get-Module -ListAvailable -Name AzurePSDrive 
-        if (-not $AzurePSDriveInstalled)
-        {
-            Save-Module -Name AzurePSDrive -Force -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
-        }
 
         Import-Module -Name $script:AzureRM_Resources -Force -Verbose
         Import-Module -Name $script:AzureRM_Profile -Force -Verbose
