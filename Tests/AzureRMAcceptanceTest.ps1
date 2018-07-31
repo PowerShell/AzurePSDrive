@@ -17,6 +17,13 @@ param (
     [string]$azureTenantId
 
 )
+
+$script:AzureRM_Profile = if($IsCoreCLR){'AzureRM.Profile.NetCore'}else{'AzureRM.Profile'}
+$script:AzureRM_Resources = if($IsCoreCLR){'AzureRM.Resources.Netcore'}else{'AzureRM.Resources'}
+$script:AzureRM_Compute = if($IsCoreCLR){'AzureRM.Compute.NetCore'}else{'AzureRM.Compute'}
+$script:AzureRM_Network = if($IsCoreCLR){'AzureRM.Network.NetCore'}else{'AzureRM.Network'}
+$script:AzureRM_Storage = if($IsCoreCLR){'AzureRM.Storage.NetCore'}else{'AzureRM.Storage'}
+
 # Note: Administrator PowerShell required to run this script.
 try {
     $env:azureADAppId = $azureADAppId
@@ -29,40 +36,64 @@ try {
         Write-Output "Ensure the Service Principal has required access to create Compute/Network/Storage resource provider instances"
     }
 
-    ## Install your version of AzureRM modules - specifically AzureRM.Resources, AzureRM.Profile, AzureRM.Compute, AzureRM.Network, AzureRM.Storage
-    Write-Output "Ensure AzureRM.Resources, AzureRM.Profile, AzureRM.Compute, AzureRM.Network, AzureRM.Storage modules are installed"
+    ## Install your version of AzureRM modules
+    Write-Output "Ensure $script:AzureRM_Profile, $script:AzureRM_Resources, $script:AzureRM_Compute, $script:AzureRM_Network, $script:AzureRM_Storage modules are installed"
 
-    Write-Output "Update PowerShellGet"
-    # Update PowerShellGet otherwise you will get an error 
-    # "Cannot process argument transformation on parameter 'InstalledModuleInfo'. Cannot convert the "System.Object[]" 
-    # value of type "System.Object[]" to type System.Management.Automation.PSModuleInfo"
-    PowerShell -command 'Install-PackageProvider NuGet -Force -ForceBootstrap; Install-Module -Name PowerShellGet -Force -AllowClobber -Repository PSGallery'
+    Write-Output "Bootstrap Nuget"
+    
+    If ($IsCoreCLR)
+    {
+        pwsh -command 'Get-PackageProvider -Name Nuget -ForceBootstrap'
+    }
+    else
+    {
+        PowerShell -command 'Get-PackageProvider -Name Nuget -ForceBootstrap'
+    }
 
-    # SHiPS is untrusted repository. Setting PSGallery's policy to Trusted allows this to install without a prompt.
-    # https://blogs.technet.microsoft.com/poshchap/2015/08/07/getting-started-with-the-powershell-gallery/
+    # Set PSGallery Repo to be Trusted to avoid prompt
     Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-    Write-Output "Install SHiPS module from PowerShellGallery - required dependency for AzurePSDrive"
-    Install-Module -Name SHiPS -Verbose -Repository PSGallery
+    
+    Write-Output "Import required modules to current session if not already done"
+    if (-not (Get-Module -Name $script:AzureRM_Profile))
+    {
+        Import-Module $script:AzureRM_Profile -Force -ErrorAction Stop
+    }
 
-    Write-Output "Import required modules to current session"
-    Import-Module AzureRM.Profile -Force -Verbose
-    Import-Module AzureRM.Storage -Force -Verbose
-    Import-Module AzureRM.Resources -Force -Verbose
-    Import-Module AzureRM.Compute -Force -Verbose
-    Import-Module AzureRM.Network -Force -Verbose
-    Import-Module SHiPS -Force -Verbose
-    AzureRM.Profile\Disable-AzureRmDataCollection
+    if (-not (Get-Module -Name $script:AzureRM_Resources))
+    {
+        Import-Module $script:AzureRM_Resources -Force -ErrorAction Stop
+    }
 
-    $azurePSDrivePath = "$PSScriptRoot\.."
+    if (-not (Get-Module -Name $script:AzureRM_Compute))
+    {
+        Import-Module $script:AzureRM_Compute -Force -ErrorAction Stop
+    }
 
-    Write-Host "Import the test wrapper for AzurePSDrive"
-    Import-Module (Join-Path $azurePSDrivePath 'tests\test.psm1') -Force -Verbose
+    if (-not (Get-Module -Name $script:AzureRM_Network))
+    {
+        Import-Module $script:AzureRM_Network -Force -ErrorAction Stop
+    }
+
+    if (-not (Get-Module -Name $script:AzureRM_Storage))
+    {
+        Import-Module $script:AzureRM_Storage -Force -ErrorAction Stop
+    }
+    
+    & $script:AzureRM_Profile\Disable-AzureRmDataCollection
+
+    $testModuleRelativePath = Get-ChildItem -Name Test.psm1 -Path $PSScriptRoot -Recurse
+    $testModuleFullPath = (Join-Path $PSScriptRoot $testModuleRelativePath)
+    
+    Write-Output "Import the test wrapper for AzurePSDrive from $testModuleFullPath"
+    Import-Module $testModuleFullPath -Force
 
     Write-Output "Login to Azure Service"
     Login-AzureRM
-
-    Write-Output "Import AzurePSDrive module to current session"
-    Import-Module (Join-Path $azurePSDrivePath 'azurepsdrive.psd1') -Force -Verbose
+        
+    $azurePSDriveFullPath = (Join-Path (Split-Path $PSScriptRoot) AzurePSDrive.psd1)
+    
+    Write-Output "Import AzurePSDrive from $azurePSDriveFullPath"
+    Import-Module $azurePSDriveFullPath -Force
 
     Write-Output "Invoke AzurePSDrive Tests"
     Invoke-AzurePSDriveTests $subscriptionName
@@ -71,7 +102,7 @@ try {
     if($PSItem.Exception.Message -like '*tests failed') {
         Write-Output $PSItem.Exception.Message
     } else {
-        Write-Host "Something went wrong: $PSItem" -ForegroundColor Red
+        Write-Output "Something went wrong: $PSItem" -ForegroundColor Red
         ($PSItem.ScriptStackTrace).Split([Environment]::NewLine) | Where-Object {$_.Length -gt 0} | ForEach-Object { Write-Verbose "`t$_" }
     }
     exit 1
