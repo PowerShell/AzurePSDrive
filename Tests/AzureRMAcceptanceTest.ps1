@@ -89,9 +89,8 @@ try {
 
     Write-Output "Login to Azure Service"
     Login-AzureRM
-    
-    $azurePSDriveRelativePath = Get-ChildItem -Name AzurePSDrive.psd1 -Path $PSScriptRoot -Recurse
-    $azurePSDriveFullPath = (Join-Path $PSScriptRoot $azurePSDriveRelativePath)
+        
+    $azurePSDriveFullPath = (Join-Path (Split-Path $PSScriptRoot) AzurePSDrive.psd1)
     
     Write-Output "Import AzurePSDrive from $azurePSDriveFullPath"
     Import-Module $azurePSDriveFullPath -Force
