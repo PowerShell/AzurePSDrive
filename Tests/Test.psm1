@@ -40,43 +40,43 @@ function Initialize-TestEnvironment
     $dependencyInstalled = (Get-Module -Name $script:AzureRM_Profile -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Install-Module -Name $script:AzureRM_Profile -ErrorAction Stop -Verbose
+        Install-Module -Name $script:AzureRM_Profile -ErrorAction Stop -Verbose -Force
     }
 
     $dependencyInstalled = (Get-Module -Name $script:AzureRM_Resources -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Install-Module -Name $script:AzureRM_Resources -ErrorAction Stop -Verbose
+        Install-Module -Name $script:AzureRM_Resources -ErrorAction Stop -Verbose -Force
     }
 
     $dependencyInstalled = (Get-Module -Name $script:AzureRM_Compute -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Install-Module -Name $script:AzureRM_Compute -ErrorAction Stop -Verbose
+        Install-Module -Name $script:AzureRM_Compute -ErrorAction Stop -Verbose -Force
     }
 
     $dependencyInstalled = (Get-Module -Name $script:AzureRM_Network -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Install-Module -Name $script:AzureRM_Network -ErrorAction Stop -Verbose
+        Install-Module -Name $script:AzureRM_Network -ErrorAction Stop -Verbose -Force
     }
 
     $dependencyInstalled = (Get-Module -Name $script:AzureRM_Storage -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Install-Module -Name $script:AzureRM_Storage -ErrorAction Stop -Verbose
+        Install-Module -Name $script:AzureRM_Storage -ErrorAction Stop -Verbose -Force
     }
 
     $dependencyInstalled = (Get-Module -Name SHiPS -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Install-Module -Name SHiPS -ErrorAction Stop -Verbose
+        Install-Module -Name SHiPS -ErrorAction Stop -Verbose -Force
     }
 
     $dependencyInstalled = (Get-Module -Name AzurePSDrive -ListAvailable )
     if (-not $dependencyInstalled)
     {
-        Install-Module -Name AzurePSDrive -ErrorAction Stop -Verbose
+        Install-Module -Name AzurePSDrive -ErrorAction Stop -Verbose -Force
     }
 
     $dependentModules = @($script:AzureRM_Profile, $script:AzureRM_Resources, $script:AzureRM_Compute, $script:AzureRM_Network, $script:AzureRM_Storage, 'SHiPS', 'AzurePSDrive')
