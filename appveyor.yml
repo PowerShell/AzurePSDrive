@@ -38,6 +38,9 @@ test_script:
         # value of type "System.Object[]" to type System.Management.Automation.PSModuleInfo"
         PowerShell -command 'Get-PackageProvider -Name Nuget -ForceBootstrap'
 
+        # Set PSGallery Repo to be Trusted to avoid prompt
+        Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+
         Write-Host "Import the test wrapper for AzurePSDrive"
         Import-Module c:\projects\azurepsdrive\tests\test.psm1 -Force -Verbose
         Initialize-TestEnvironment

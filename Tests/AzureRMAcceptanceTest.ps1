@@ -49,6 +49,9 @@ try {
     {
         PowerShell -command 'Get-PackageProvider -Name Nuget -ForceBootstrap'
     }
+
+    # Set PSGallery Repo to be Trusted to avoid prompt
+    Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
     
     Write-Output "Import required modules to current session"
     Import-Module $script:AzureRM_Profile -Force -ErrorAction Stop
