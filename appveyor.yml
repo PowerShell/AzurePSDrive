@@ -41,7 +41,7 @@ test_script:
         Write-Host "Import the test wrapper for AzurePSDrive"
         Import-Module c:\projects\azurepsdrive\tests\test.psm1 -Force -Verbose
         Initialize-TestEnvironment
-        Login-AzureRM        
+        Login-AzureRM
 
         Write-Host "Import AzurePSDrive module to current session"
         Import-Module c:\projects\azurepsdrive\azurepsdrive.psd1 -Force -Verbose

@@ -67,7 +67,7 @@ function Initialize-TestEnvironment
         Install-Module -Name $script:AzureRM_Storage -ErrorAction Stop
     }
 
-    $dependencyInstalled = (Get-Module -Name SHiPS -ListAvailable )
+    $dependencyInstalled = (Get-Module -Name SHiPS -ListAvailable)
     if (-not $dependencyInstalled)
     {
         Install-Module -Name SHiPS -ErrorAction Stop
