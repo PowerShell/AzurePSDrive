@@ -122,7 +122,6 @@ function Remove-AzureTestResource
 
 #region Test Suite Initialization
 cd $PSScriptRoot
-Initialize-TestEnvironment
 Test-Dependency
 Initialize-AzureTestResource
 New-AzureDrive
