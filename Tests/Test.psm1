@@ -40,50 +40,50 @@ function Initialize-TestEnvironment
     $dependencyInstalled = (Get-Module -Name $script:AzureRM_Profile -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Install-Module -Name $script:AzureRM_Profile -ErrorAction Stop
+        Install-Module -Name $script:AzureRM_Profile -ErrorAction Stop -Verbose
     }
 
     $dependencyInstalled = (Get-Module -Name $script:AzureRM_Resources -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Install-Module -Name $script:AzureRM_Resources -ErrorAction Stop
+        Install-Module -Name $script:AzureRM_Resources -ErrorAction Stop -Verbose
     }
 
     $dependencyInstalled = (Get-Module -Name $script:AzureRM_Compute -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Install-Module -Name $script:AzureRM_Compute -ErrorAction Stop
+        Install-Module -Name $script:AzureRM_Compute -ErrorAction Stop -Verbose
     }
 
     $dependencyInstalled = (Get-Module -Name $script:AzureRM_Network -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Install-Module -Name $script:AzureRM_Network -ErrorAction Stop
+        Install-Module -Name $script:AzureRM_Network -ErrorAction Stop -Verbose
     }
 
     $dependencyInstalled = (Get-Module -Name $script:AzureRM_Storage -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Install-Module -Name $script:AzureRM_Storage -ErrorAction Stop
+        Install-Module -Name $script:AzureRM_Storage -ErrorAction Stop -Verbose
     }
 
     $dependencyInstalled = (Get-Module -Name SHiPS -ListAvailable)
     if (-not $dependencyInstalled)
     {
-        Install-Module -Name SHiPS -ErrorAction Stop
+        Install-Module -Name SHiPS -ErrorAction Stop -Verbose
     }
 
     $dependencyInstalled = (Get-Module -Name AzurePSDrive -ListAvailable )
     if (-not $dependencyInstalled)
     {
-        Install-Module -Name AzurePSDrive -ErrorAction Stop
+        Install-Module -Name AzurePSDrive -ErrorAction Stop -Verbose
     }
 
     $dependentModules = @($script:AzureRM_Profile, $script:AzureRM_Resources, $script:AzureRM_Compute, $script:AzureRM_Network, $script:AzureRM_Storage, 'SHiPS', 'AzurePSDrive')
 
     foreach($dependentModule in $dependentModules)
     {
-        Import-Module -Name $dependentModule -ErrorAction Stop
+        Import-Module -Name $dependentModule -ErrorAction Stop -Verbose
     }
 
     & $script:AzureRM_Profile\Disable-AzureRmDataCollection
