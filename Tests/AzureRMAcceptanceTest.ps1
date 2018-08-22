@@ -18,11 +18,11 @@ param (
 
 )
 
-$script:AzureRM_Profile = if($IsCoreCLR){'AzureRM.Profile.NetCore'}else{'AzureRM.Profile'}
-$script:AzureRM_Resources = if($IsCoreCLR){'AzureRM.Resources.Netcore'}else{'AzureRM.Resources'}
-$script:AzureRM_Compute = if($IsCoreCLR){'AzureRM.Compute.NetCore'}else{'AzureRM.Compute'}
-$script:AzureRM_Network = if($IsCoreCLR){'AzureRM.Network.NetCore'}else{'AzureRM.Network'}
-$script:AzureRM_Storage = if($IsCoreCLR){'AzureRM.Storage.NetCore'}else{'AzureRM.Storage'}
+$script:AzureRM_Profile = 'Az.Profile'
+$script:AzureRM_Resources = 'Az.Resources'
+$script:AzureRM_Compute = 'Az.Compute'
+$script:AzureRM_Network = 'Az.Network'
+$script:AzureRM_Storage = 'Az.Storage'
 
 # Note: Administrator PowerShell required to run this script.
 try {
