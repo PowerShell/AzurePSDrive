@@ -1,6 +1,5 @@
 ﻿using namespace Microsoft.PowerShell.SHiPS
 
-$script:Az_WebApp = 'Az.Websites'
 # Get-AzWebApp cmdlet has nested write-progress. We can fix the tab completion issue in PSReadline and PSCore for not nested
 # progress. See discussion https://github.com/PowerShell/PowerShell/pull/7023 and issue https://github.com/PowerShell/PowerShell/issues/7022.
 # By suppressing the progress for Get-AzWebApp below will close the line gap but it does not affect the command line ProgressPreference setting. 
@@ -25,7 +24,7 @@ class WebApps : SHiPSDirectory
             Import-Module Az.Websites
         }
 
-        return @(& "$script:Az_WebApp\Get-AzWebApp" | %{ $_.psobject.typenames.Insert(0, "AzurePSDriveWebApp"); $_ })
+        return @(Az.Websites\Get-AzWebApp | %{ $_.psobject.typenames.Insert(0, "AzurePSDriveWebApp"); $_ })
 
     }
  }

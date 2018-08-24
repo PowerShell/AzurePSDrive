@@ -4,8 +4,6 @@ using module .\AzurePSDriveStorageAccount.psm1
 using module .\AzurePSDriveVM.psm1
 using module .\AzurePSDriveWebApp.psm1
 
-$script:Az_Profile = 'Az.Profile'
-$script:Az_Resources = 'Az.Resources'
 $script:pathPattern = [System.IO.Path]::Combine('Az:', '*', 'ResourceGroups', '*')
 $script:pathSeparator = if([System.IO.Path]::DirectorySeparatorChar -eq '\'){'\\'}else{'/'}
 
@@ -19,10 +17,10 @@ class Az : SHiPSDirectory
     {        
         # Ensure Session is logged-on to access Azure resources
         # This is done in the constructor so that it is a runtime check and not done during module import.
-        $context = (& "$script:Az_Profile\Get-AzContext")
+        $context = Az.Profile\Get-AzContext
         if ([string]::IsNullOrEmpty($($context.Account)))
         {
-            throw "Ensure that session has access to Azure resources - use $script:Az_Profile\Connect-AzAccount or $script:Az_Profile\Login-AzAccount"
+            throw "Ensure that session has access to Azure resources - use Az.Profile\Connect-AzAccount or Az.Profile\Login-AzAccount"
         }
     } 
 
@@ -37,7 +35,7 @@ class Az : SHiPSDirectory
         if (-not $env:ACC_TID)
         {
             # Default tenantId not provided (perhaps provider is being run standalone => not in Cloud Shell)
-            $tenant = (& "$script:Az_Profile\Get-AzTenant")
+            $tenant = Az.Profile\Get-AzTenant
 
             if (($tenant -eq $null) -or ($tenant.Count -eq 0))
             {
@@ -56,7 +54,7 @@ class Az : SHiPSDirectory
             $defaultTenantId = $env:ACC_TID
         }
         
-        $subscriptions = $((& "$script:Az_Profile\Get-AzSubscription" -TenantId $defaultTenantId) | Sort-Object -Property Name)
+        $subscriptions = $((Az.Profile\Get-AzSubscription -TenantId $defaultTenantId) | Sort-Object -Property Name)
         $subGroup = $subscriptions | Group-Object -Property Name
 
         foreach ($subscription in $subscriptions)
@@ -88,7 +86,8 @@ class Subscription : SHiPSDirectory
 
     [object[]] GetChildItem()
     {        
-        & "$script:Az_Profile\Select-AzSubscription" -SubscriptionName $this.SubscriptionName -TenantId $this.TenantId
+        # TODO BUGBUG Select-AzureRmSubscription be fixed next week
+        Az.Profile\Select-AzureRmSubscription -SubscriptionName $this.SubscriptionName -TenantId $this.TenantId
         $obj =  @()
 
         $obj+=[AllResources]::new();
@@ -124,7 +123,7 @@ class ResourceGroups : SHiPSDirectory
         $obj =  @()
         $subId = $this.SubscriptionId
 
-        @(& "$script:Az_Resources\Get-AzResourceGroup").Foreach{
+        @(Az.Resources\Get-AzResourceGroup).Foreach{
              
             $obj +=  [ResourceGroup]::new($subId, $_.ResourceGroupName, $_.Location, $_.ProvisioningState);                  
         }
@@ -153,7 +152,7 @@ class ResourceGroup : SHiPSDirectory
     {        
         $obj =  @()
 
-        $resourceTypes = @(& "$script:Az_Resources\Get-AzResource" | Where-Object {$_.ResourceGroupName -eq $this.ResourceGroupName}  | select-Object -Property ResourceType -Unique).ForEach{$_.ResourceType.Split('/')[0]} | Select-Object -Unique
+        $resourceTypes = @(Az.Resources\Get-AzResource | Where-Object {$_.ResourceGroupName -eq $this.ResourceGroupName}  | select-Object -Property ResourceType -Unique).ForEach{$_.ResourceType.Split('/')[0]} | Select-Object -Unique
         foreach ($resourceType in $resourceTypes)
         {            
             $tempObj = [ResourceProvider]::new($resourceType, $this.ResourceGroupName);            
@@ -186,7 +185,7 @@ class ResourceProvider : SHiPSDirectory
         $obj =  @()
 
         $resourceTypeTokens = @()
-        @(& "$script:Az_Resources\Get-AzResource" | Where-Object {$_.ResourceGroupName -eq $this.resourceGroupName} | Select-Object -Property ResourceType -Unique).ForEach{
+        @(Az.Resources\Get-AzResource | Where-Object {$_.ResourceGroupName -eq $this.resourceGroupName} | Select-Object -Property ResourceType -Unique).ForEach{
 
             $providerNS = $_.ResourceType.Split('/')[0]
             $resourceType = $_.ResourceType.Substring($_.ResourceType.IndexOf('/')+1)
@@ -242,7 +241,7 @@ class ResourceType : SHiPSDirectory
             $AzResourceParams += @{'ODataQuery'=(Get-ODataQueryFilter -filter $this.ProviderContext.Filter)}
         }
         
-        @(& "$script:Az_Resources\Get-AzResource" @AzResourceParams).Foreach{
+        @(Az.Resources\Get-AzResource @AzResourceParams).Foreach{
                     
             if ($_.PSTypeNames.Contains('Microsoft.Network.networkSecurityGroups'))
             {   

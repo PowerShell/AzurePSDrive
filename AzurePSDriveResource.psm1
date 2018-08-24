@@ -1,8 +1,5 @@
 ﻿using namespace Microsoft.PowerShell.SHiPS
 
-$script:Az_Resources = 'Az.Resources'
-
-
 [SHiPSProvider(UseCache=$true)]
 class AllResources : SHiPSDirectory
 {
@@ -16,6 +13,6 @@ class AllResources : SHiPSDirectory
 
     [object[]] GetChildItem()
     {
-        return @(& "$script:Az_Resources\Get-AzResource" | %{ $_.psobject.typenames.Insert(0, "AzurePSDriveResourceType"); $_ })
+        return @(Az.Resources\Get-AzResource | %{ $_.psobject.typenames.Insert(0, "AzurePSDriveResourceType"); $_ })
     }
  }

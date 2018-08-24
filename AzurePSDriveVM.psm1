@@ -1,6 +1,5 @@
 ﻿using namespace Microsoft.PowerShell.SHiPS
 
-$script:Az_Compute = 'Az.Compute'
 
 [SHiPSProvider(UseCache=$true)]
 class VirtualMachines : SHiPSDirectory
@@ -15,7 +14,7 @@ class VirtualMachines : SHiPSDirectory
 
     [object[]] GetChildItem()
     {
-        return @(& "$script:Az_Compute\Get-AzVM" -Status | %{ $_.psobject.typenames.Insert(0, "AzurePSDriveVM"); $_ })
+        return @(Az.Compute\Get-AzVM -Status | %{ $_.psobject.typenames.Insert(0, "AzurePSDriveVM"); $_ })
     }
  }
 
