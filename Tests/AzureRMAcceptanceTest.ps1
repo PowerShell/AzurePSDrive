@@ -18,11 +18,11 @@ param (
 
 )
 
-$script:AzureRM_Profile = if($IsCoreCLR){'AzureRM.Profile.NetCore'}else{'AzureRM.Profile'}
-$script:AzureRM_Resources = if($IsCoreCLR){'AzureRM.Resources.Netcore'}else{'AzureRM.Resources'}
-$script:AzureRM_Compute = if($IsCoreCLR){'AzureRM.Compute.NetCore'}else{'AzureRM.Compute'}
-$script:AzureRM_Network = if($IsCoreCLR){'AzureRM.Network.NetCore'}else{'AzureRM.Network'}
-$script:AzureRM_Storage = if($IsCoreCLR){'AzureRM.Storage.NetCore'}else{'AzureRM.Storage'}
+$script:Az_Profile = 'Az.Profile'
+$script:Az_Resources = 'Az.Resources'
+$script:Az_Compute = 'Az.Compute'
+$script:Az_Network = 'Az.Network'
+$script:Az_Storage = 'Az.Storage'
 
 # Note: Administrator PowerShell required to run this script.
 try {
@@ -36,8 +36,8 @@ try {
         Write-Output "Ensure the Service Principal has required access to create Compute/Network/Storage resource provider instances"
     }
 
-    ## Install your version of AzureRM modules
-    Write-Output "Ensure $script:AzureRM_Profile, $script:AzureRM_Resources, $script:AzureRM_Compute, $script:AzureRM_Network, $script:AzureRM_Storage modules are installed"
+    ## Install your version of Az modules
+    Write-Output "Ensure $script:Az_Profile, $script:Az_Resources, $script:Az_Compute, $script:Az_Network, $script:Az_Storage modules are installed"
 
     Write-Output "Bootstrap Nuget"
     
@@ -54,32 +54,32 @@ try {
     Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
     
     Write-Output "Import required modules to current session if not already done"
-    if (-not (Get-Module -Name $script:AzureRM_Profile))
+    if (-not (Get-Module -Name $script:Az_Profile))
     {
-        Import-Module $script:AzureRM_Profile -Force -ErrorAction Stop
+        Import-Module $script:Az_Profile -Force -ErrorAction Stop
     }
 
-    if (-not (Get-Module -Name $script:AzureRM_Resources))
+    if (-not (Get-Module -Name $script:Az_Resources))
     {
-        Import-Module $script:AzureRM_Resources -Force -ErrorAction Stop
+        Import-Module $script:Az_Resources -Force -ErrorAction Stop
     }
 
-    if (-not (Get-Module -Name $script:AzureRM_Compute))
+    if (-not (Get-Module -Name $script:Az_Compute))
     {
-        Import-Module $script:AzureRM_Compute -Force -ErrorAction Stop
+        Import-Module $script:Az_Compute -Force -ErrorAction Stop
     }
 
-    if (-not (Get-Module -Name $script:AzureRM_Network))
+    if (-not (Get-Module -Name $script:Az_Network))
     {
-        Import-Module $script:AzureRM_Network -Force -ErrorAction Stop
+        Import-Module $script:Az_Network -Force -ErrorAction Stop
     }
 
-    if (-not (Get-Module -Name $script:AzureRM_Storage))
+    if (-not (Get-Module -Name $script:Az_Storage))
     {
-        Import-Module $script:AzureRM_Storage -Force -ErrorAction Stop
+        Import-Module $script:Az_Storage -Force -ErrorAction Stop
     }
     
-    & $script:AzureRM_Profile\Disable-AzureRmDataCollection
+    & $script:Az_Profile\Disable-AzDataCollection
 
     $testModuleRelativePath = Get-ChildItem -Name Test.psm1 -Path $PSScriptRoot -Recurse
     $testModuleFullPath = (Join-Path $PSScriptRoot $testModuleRelativePath)
@@ -88,7 +88,7 @@ try {
     Import-Module $testModuleFullPath -Force
 
     Write-Output "Login to Azure Service"
-    Login-AzureRM
+    Login-Az
         
     $azurePSDriveFullPath = (Join-Path (Split-Path $PSScriptRoot) AzurePSDrive.psd1)
     

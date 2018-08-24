@@ -1,6 +1,6 @@
 ﻿using namespace Microsoft.PowerShell.SHiPS
 
-$script:AzureRM_Resources = if($IsCoreCLR){'AzureRM.Resources.Netcore'}else{'AzureRM.Resources'}
+$script:Az_Resources = 'Az.Resources'
 
 
 [SHiPSProvider(UseCache=$true)]
@@ -16,6 +16,6 @@ class AllResources : SHiPSDirectory
 
     [object[]] GetChildItem()
     {
-        return @(& "$script:AzureRM_Resources\Get-AzureRmResource" | %{ $_.psobject.typenames.Insert(0, "AzurePSDriveResourceType"); $_ })
+        return @(& "$script:Az_Resources\Get-AzResource" | %{ $_.psobject.typenames.Insert(0, "AzurePSDriveResourceType"); $_ })
     }
  }
