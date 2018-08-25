@@ -1,10 +1,10 @@
 $PSScriptRoot = $MyInvocation.MyCommand.Path
 
-$script:AzureRM_Profile = if($IsCoreCLR){'AzureRM.Profile.NetCore'}else{'AzureRM.Profile'}
-$script:AzureRM_Resources = if($IsCoreCLR){'AzureRM.Resources.Netcore'}else{'AzureRM.Resources'}
-$script:AzureRM_Compute = if($IsCoreCLR){'AzureRM.Compute.NetCore'}else{'AzureRM.Compute'}
-$script:AzureRM_Network = if($IsCoreCLR){'AzureRM.Network.NetCore'}else{'AzureRM.Network'}
-$script:AzureRM_Storage = if($IsCoreCLR){'AzureRM.Storage.NetCore'}else{'AzureRM.Storage'}
+$script:AzureRM_Profile = if($IsCoreCLR){'Az.Profile'}else{'AzureRM.Profile'}
+$script:AzureRM_Resources = if($IsCoreCLR){'Az.Resources'}else{'AzureRM.Resources'}
+$script:AzureRM_Compute = if($IsCoreCLR){'Az.Compute'}else{'AzureRM.Compute'}
+$script:AzureRM_Network = if($IsCoreCLR){'Az.Network'}else{'AzureRM.Network'}
+$script:AzureRM_Storage = if($IsCoreCLR){'Az.Storage'}else{'AzureRM.Storage'}
 
 function Invoke-AzurePSDriveTests([string]$subscriptionName = 'AutomationTeam')
 {

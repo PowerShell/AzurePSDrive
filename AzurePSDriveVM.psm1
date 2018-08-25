@@ -1,6 +1,11 @@
 ﻿using namespace Microsoft.PowerShell.SHiPS
 
-$script:AzureRM_Compute = if($IsCoreCLR){'AzureRM.Compute.Netcore'}else{'AzureRM.Compute'}
+$script:AzureRM_Compute = if($IsCoreCLR){'Az.Compute'}else{'AzureRM.Compute'}
+
+if($IsCoreCLR)
+{
+    Enable-AzureRmAlias
+}
 
 [SHiPSProvider(UseCache=$true)]
 class VirtualMachines : SHiPSDirectory
@@ -15,7 +20,7 @@ class VirtualMachines : SHiPSDirectory
 
     [object[]] GetChildItem()
     {
-        return @(& "$script:AzureRM_Compute\Get-AzureRmVM" -Status | %{ $_.psobject.typenames.Insert(0, "AzurePSDriveVM"); $_ })
+        return @(Get-AzureRmVM -Status | %{ $_.psobject.typenames.Insert(0, "AzurePSDriveVM"); $_ })
     }
  }
 
