@@ -49,8 +49,8 @@ Description = 'AzurePSDrive provider is a SHiPS based PowerShell provider to sim
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = if($PSEdition -eq 'Core')
 {
-    #Bug in AzureRM.Websites.netcore. @('AzureRM.Profile.netcore', 'AzureRM.Resources.netcore', 'AzureRM.Compute.netcore', 'AzureRM.Websites.netcore', 'AzureRM.Storage.netcore','SHiPS')
-    @('AzureRM.Profile.netcore', 'AzureRM.Resources.netcore', 'AzureRM.Compute.netcore', 'AzureRM.Storage.netcore','SHiPS')
+    #Bug in Az.Websites. @('Az.Profile', 'Az.Resources', 'Az.Compute', 'Az.Websites', 'Az.Storage','SHiPS')
+    @('Az.Profile', 'Az.Resources', 'Az.Compute', 'Az.Storage','SHiPS')
 }
 else #Desktop
 {

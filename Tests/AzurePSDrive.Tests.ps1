@@ -7,11 +7,16 @@ param (
     [string]$subscriptionName = 'AutomationTeam'
 )
 
-$script:AzureRM_Profile = if($IsCoreCLR){'AzureRM.Profile.NetCore'}else{'AzureRM.Profile'}
-$script:AzureRM_Resources = if($IsCoreCLR){'AzureRM.Resources.Netcore'}else{'AzureRM.Resources'}
-$script:AzureRM_Compute = if($IsCoreCLR){'AzureRM.Compute.NetCore'}else{'AzureRM.Compute'}
-$script:AzureRM_Network = if($IsCoreCLR){'AzureRM.Network.NetCore'}else{'AzureRM.Network'}
-$script:AzureRM_Storage = if($IsCoreCLR){'AzureRM.Storage.NetCore'}else{'AzureRM.Storage'}
+$script:AzureRM_Profile = if($IsCoreCLR){'Az.Profile'}else{'AzureRM.Profile'}
+$script:AzureRM_Resources = if($IsCoreCLR){'Az.Resources'}else{'AzureRM.Resources'}
+$script:AzureRM_Compute = if($IsCoreCLR){'Az.Compute'}else{'AzureRM.Compute'}
+$script:AzureRM_Network = if($IsCoreCLR){'Az.Network'}else{'AzureRM.Network'}
+$script:AzureRM_Storage = if($IsCoreCLR){'Az.Storage'}else{'AzureRM.Storage'}
+
+if($IsCoreCLR)
+{
+    Enable-AzureRmAlias
+}
 
 function New-PartialGuidForName { ([guid]::NewGuid().ToString() -replace '-','')[0..9] -join '' }
 
@@ -59,47 +64,47 @@ function New-AzureDrive
 # Initialize ResourceGroup and other Azure deployments
 # One time setup in Azure
 function Initialize-AzureTestResource
-{    
+{
     Write-Verbose "Creating the resources used by the tests..."
     # ResourceGroup
-    $rg = & $script:AzureRM_Resources\Get-AzureRmResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
+    $rg = Get-AzureRmResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
     if ($rg -eq $null)
     {
-        $rg = & $script:AzureRM_Resources\New-AzureRmResourceGroup -Name $resourceGroupName -Location $location -Force -Verbose
+        $rg = New-AzureRmResourceGroup -Name $resourceGroupName -Location $location -Force -Verbose
     }
 
     #Storage
-    $storage = & $script:AzureRM_Storage\Get-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $resourceGroupName -ErrorAction SilentlyContinue
+    $storage = Get-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $resourceGroupName -ErrorAction SilentlyContinue
     if ($storage -eq $null)
     {
-        $storage = & $script:AzureRM_Storage\New-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $resourceGroupName -Location $location -SkuName $skuName -Verbose
+        $storage = New-AzureRmStorageAccount -Name $storageAccountName -ResourceGroupName $resourceGroupName -Location $location -SkuName $skuName -Verbose
     }
 
     #Network
-    $interface = & $script:AzureRM_Network\Get-AzureRmNetworkInterface -Name $interfaceName -ResourceGroupName $resourceGroupName -ErrorAction SilentlyContinue
+    $interface = Get-AzureRmNetworkInterface -Name $interfaceName -ResourceGroupName $resourceGroupName -ErrorAction SilentlyContinue
     if ($interface -eq $null)
     {
-        $pubIp = & $script:AzureRM_Network\New-AzureRmPublicIpAddress -Name $interfaceName -ResourceGroupName $resourceGroupName -Location $location -AllocationMethod Dynamic -Force -Verbose
-        $subnetConfig = & $script:AzureRM_Network\New-AzureRmVirtualNetworkSubnetConfig -Name $subnetName -AddressPrefix $vnetSubnetAddressPrefix -Verbose
-        $vnet = & $script:AzureRM_Network\New-AzureRmVirtualNetwork -Name $vnetName -ResourceGroupName $resourceGroupName -Location $location -AddressPrefix $vnetAddressPrefix -Subnet $subnetConfig -Force -Verbose
-        $interface = & $script:AzureRM_Network\New-AzureRmNetworkInterface -Name $interfaceName -ResourceGroupName $resourceGroupName -Location $location -SubnetId $vnet.Subnets[0].Id -PublicIpAddressId $pubIp.Id -Force -Verbose
+        $pubIp = New-AzureRmPublicIpAddress -Name $interfaceName -ResourceGroupName $resourceGroupName -Location $location -AllocationMethod Dynamic -Force -Verbose
+        $subnetConfig = New-AzureRmVirtualNetworkSubnetConfig -Name $subnetName -AddressPrefix $vnetSubnetAddressPrefix -Verbose
+        $vnet = New-AzureRmVirtualNetwork -Name $vnetName -ResourceGroupName $resourceGroupName -Location $location -AddressPrefix $vnetAddressPrefix -Subnet $subnetConfig -Force -Verbose
+        $interface = New-AzureRmNetworkInterface -Name $interfaceName -ResourceGroupName $resourceGroupName -Location $location -SubnetId $vnet.Subnets[0].Id -PublicIpAddressId $pubIp.Id -Force -Verbose
     }
         
     #Compute - VM
-    $virtualMachine = & $script:AzureRM_Compute\Get-AzureRmVM -Name $vmName -ResourceGroupName $resourceGroupName -ErrorAction SilentlyContinue
+    $virtualMachine = Get-AzureRmVM -Name $vmName -ResourceGroupName $resourceGroupName -ErrorAction SilentlyContinue
     if ($virtualMachine -eq $null)
     {
         $password = "TestAsdf1234!!!" | ConvertTo-SecureString -asPlainText -Force
         $credential = $credential = New-Object System.Management.Automation.PSCredential($adminUserName,$password)
-        $virtualMachine = & $script:AzureRM_Compute\New-AzureRmVMConfig -VMName $vmName -VMSize $vmSize
-        $virtualMachine = & $script:AzureRM_Compute\Set-AzureRmVMOperatingSystem -VM $virtualMachine -Windows -ComputerName $computerName -Credential $credential -ProvisionVMAgent -EnableAutoUpdate
-        $virtualMachine = & $script:AzureRM_Compute\Set-AzureRmVMSourceImage -VM $virtualMachine -PublisherName MicrosoftWindowsServer -Offer WindowsServer -Skus 2012-R2-Datacenter -Version "latest"
-        $virtualMachine = & $script:AzureRM_Compute\Add-AzureRmVMNetworkInterface -VM $virtualMachine -Id $interface.Id
+        $virtualMachine = New-AzureRmVMConfig -VMName $vmName -VMSize $vmSize
+        $virtualMachine = Set-AzureRmVMOperatingSystem -VM $virtualMachine -Windows -ComputerName $computerName -Credential $credential -ProvisionVMAgent -EnableAutoUpdate
+        $virtualMachine = Set-AzureRmVMSourceImage -VM $virtualMachine -PublisherName MicrosoftWindowsServer -Offer WindowsServer -Skus 2012-R2-Datacenter -Version "latest"
+        $virtualMachine = Add-AzureRmVMNetworkInterface -VM $virtualMachine -Id $interface.Id
         $osDiskUri = $storage.PrimaryEndpoints.Blob.ToString() + "vhds/" + $osDiskName + ".vhd"
-        $virtualMachine = & $script:AzureRM_Compute\Set-AzureRmVMOSDisk -VM $virtualMachine -Name $osDiskName -VhdUri $osDiskUri -CreateOption FromImage    
+        $virtualMachine = Set-AzureRmVMOSDisk -VM $virtualMachine -Name $osDiskName -VhdUri $osDiskUri -CreateOption FromImage    
 
         #Create the VM in Azure
-        & $script:AzureRM_Compute\New-AzureRmVM -ResourceGroupName $resourceGroupName -Location $location -VM $virtualMachine
+        New-AzureRmVM -ResourceGroupName $resourceGroupName -Location $location -VM $virtualMachine
     }
     Write-Verbose "Resources created."
 }
@@ -111,10 +116,10 @@ function Remove-AzureTestResource
 {
     Write-Verbose "Deleting the resources used by the tests..."
     # ResourceGroup
-    $rg = & $script:AzureRM_Resources\Get-AzureRmResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
+    $rg = Get-AzureRmResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
     if ($rg -ne $null)
     {
-        $rg | & $script:AzureRM_Resources\Remove-AzureRmResourceGroup -Force
+        $rg | Remove-AzureRmResourceGroup -Force
     }
     Write-Verbose "Resources deleted."
 }
@@ -268,11 +273,11 @@ Describe ResourceGroupPSDefaultParameterValues {
     }
 
     It "Retrieving VM in a specific resourceGroup with PSDefaultParameterValues" {        
-        $vmInAllResourceGroup = & $script:AzureRM_Compute\Get-AzureRmVM
+        $vmInAllResourceGroup = Get-AzureRmVM
         
         # Navigate to a specific ResourceGroup
         cd "$resourceGroupName"
-        $vmInSpecificResourceGroup = & $script:AzureRM_Compute\Get-AzureRmVM
+        $vmInSpecificResourceGroup = Get-AzureRmVM
 
         # Since PSDefaultParameterValues are passed to Get-AzureRmVM when in a particular ResourceGroup
         # results are filtered to the specific ResourceGroup
@@ -538,7 +543,7 @@ Describe Get-AllResourcesWithRecurse {
 #region AllResources, VMs, StorageAccounts, and Webapps tests
 Describe "Get AllResource, VMs, StorageAccounts and Webapps" {
     BeforeAll {     
-        & $script:AzureRM_Profile\Disable-AzureRmDataCollection
+        & Disable-AzureRmDataCollection
         cd "Azure:\$subscriptionName\"
     }
 
