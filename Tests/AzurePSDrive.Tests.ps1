@@ -51,7 +51,7 @@ function Test-Dependency
 # Create AzurePSDrive PowerShell Drive
 function New-AzureDrive
 {   
-    $driveName = 'Azure'
+    $driveName = 'Az'
     Remove-PSDrive $driveName -ErrorAction SilentlyContinue    
     New-PSDrive -Name $driveName -PSProvider SHiPS -Root AzurePSDrive#Azure -Scope Global -ErrorAction Stop
 }
