@@ -4,16 +4,16 @@ using module .\AzurePSDriveStorageAccount.psm1
 using module .\AzurePSDriveVM.psm1
 using module .\AzurePSDriveWebApp.psm1
 
-$script:pathPattern = [System.IO.Path]::Combine('Az:', '*', 'ResourceGroups', '*')
+$script:pathPattern = [System.IO.Path]::Combine('Azure:', '*', 'ResourceGroups', '*')
 $script:pathSeparator = if([System.IO.Path]::DirectorySeparatorChar -eq '\'){'\\'}else{'/'}
 
 # Automatically pick resource group when inside resourcegroups of Azure drive
 $Global:PSDefaultParameterValues['*-Az*:ResourceGroupName'] = {if($pwd -like $script:pathPattern){($pwd -split $script:pathSeparator)[3]}}
 
 [SHiPSProvider(UseCache=$true)]
-class Az : SHiPSDirectory
+class Azure : SHiPSDirectory
 {
-    Az([string]$name): base($name)
+    Azure([string]$name): base($name)
     {        
         # Ensure Session is logged-on to access Azure resources
         # This is done in the constructor so that it is a runtime check and not done during module import.
