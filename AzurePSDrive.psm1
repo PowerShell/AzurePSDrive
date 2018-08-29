@@ -4,13 +4,11 @@ using module .\AzurePSDriveStorageAccount.psm1
 using module .\AzurePSDriveVM.psm1
 using module .\AzurePSDriveWebApp.psm1
 
-$script:AzureRM_Profile = if($IsCoreCLR){'AzureRM.Profile.NetCore'}else{'AzureRM.Profile'}
-$script:AzureRM_Resources = if($IsCoreCLR){'AzureRM.Resources.Netcore'}else{'AzureRM.Resources'}
 $script:pathPattern = [System.IO.Path]::Combine('Azure:', '*', 'ResourceGroups', '*')
 $script:pathSeparator = if([System.IO.Path]::DirectorySeparatorChar -eq '\'){'\\'}else{'/'}
 
 # Automatically pick resource group when inside resourcegroups of Azure drive
-$Global:PSDefaultParameterValues['*-AzureRM*:ResourceGroupName'] = {if($pwd -like $script:pathPattern){($pwd -split $script:pathSeparator)[3]}}
+$Global:PSDefaultParameterValues['*-Az*:ResourceGroupName'] = {if($pwd -like $script:pathPattern){($pwd -split $script:pathSeparator)[3]}}
 
 [SHiPSProvider(UseCache=$true)]
 class Azure : SHiPSDirectory
@@ -19,10 +17,10 @@ class Azure : SHiPSDirectory
     {        
         # Ensure Session is logged-on to access Azure resources
         # This is done in the constructor so that it is a runtime check and not done during module import.
-        $context = (& "$script:AzureRM_Profile\Get-AzureRmContext")
+        $context = Az.Profile\Get-AzContext
         if ([string]::IsNullOrEmpty($($context.Account)))
         {
-            throw "Ensure that session has access to Azure resources - use $script:AzureRM_Profile\Add-AzureRMAccount or $script:AzureRM_Profile\Login-AzureRMAccount"
+            throw "Ensure that session has access to Azure resources - use Az.Profile\Connect-AzAccount or Az.Profile\Login-AzAccount"
         }
     } 
 
@@ -37,7 +35,7 @@ class Azure : SHiPSDirectory
         if (-not $env:ACC_TID)
         {
             # Default tenantId not provided (perhaps provider is being run standalone => not in Cloud Shell)
-            $tenant = (& "$script:AzureRM_Profile\Get-AzureRmTenant")
+            $tenant = Az.Profile\Get-AzTenant
 
             if (($tenant -eq $null) -or ($tenant.Count -eq 0))
             {
@@ -47,7 +45,7 @@ class Azure : SHiPSDirectory
             # Use the first tenant, since this maps to the default directory chosen by the user via Portal
             $defaultTenantId = $tenant[0].Id
             Write-Verbose "Using TenantId '$($tenant[0].TenantId)'"                
-            Write-Verbose "To change default tenant: Use AzureRM.profile\Get-AzureRmTenant to retrieve your tenants corresponding to directories and set environment variable 'ACC_TID' to desired tenant"
+            Write-Verbose "To change default tenant: Use Az.profile\Get-AzTenant to retrieve your tenants corresponding to directories and set environment variable 'ACC_TID' to desired tenant"
             Write-Verbose "Reload AzurePSDrive provider OR use 'dir -Force' when navigating the subscription"
         }
         else
@@ -56,7 +54,7 @@ class Azure : SHiPSDirectory
             $defaultTenantId = $env:ACC_TID
         }
         
-        $subscriptions = $((& "$script:AzureRM_Profile\Get-AzureRmSubscription" -TenantId $defaultTenantId) | Sort-Object -Property Name)
+        $subscriptions = $((Az.Profile\Get-AzSubscription -TenantId $defaultTenantId) | Sort-Object -Property Name)
         $subGroup = $subscriptions | Group-Object -Property Name
 
         foreach ($subscription in $subscriptions)
@@ -88,7 +86,8 @@ class Subscription : SHiPSDirectory
 
     [object[]] GetChildItem()
     {        
-        & "$script:AzureRM_Profile\Select-AzureRmSubscription" -SubscriptionName $this.SubscriptionName -TenantId $this.TenantId
+        # TODO BUGBUG Select-AzureRmSubscription be fixed next week
+        Az.Profile\Select-AzureRmSubscription -SubscriptionName $this.SubscriptionName -TenantId $this.TenantId
         $obj =  @()
 
         $obj+=[AllResources]::new();
@@ -120,11 +119,11 @@ class ResourceGroups : SHiPSDirectory
 
     [object[]] GetChildItem()
     {
-        #AzureRM.profile\Select-AzureRmSubscription -SubscriptionName $this.SubscriptionName -TenantId $this.TenantId
+        #Az.profile\Select-AzSubscription -SubscriptionName $this.SubscriptionName -TenantId $this.TenantId
         $obj =  @()
         $subId = $this.SubscriptionId
 
-        @(& "$script:AzureRM_Resources\Get-AzureRmResourceGroup").Foreach{
+        @(Az.Resources\Get-AzResourceGroup).Foreach{
              
             $obj +=  [ResourceGroup]::new($subId, $_.ResourceGroupName, $_.Location, $_.ProvisioningState);                  
         }
@@ -153,7 +152,7 @@ class ResourceGroup : SHiPSDirectory
     {        
         $obj =  @()
 
-        $resourceTypes = @(& "$script:AzureRM_Resources\Get-AzureRmResource" | Where-Object {$_.ResourceGroupName -eq $this.ResourceGroupName}  | select-Object -Property ResourceType -Unique).ForEach{$_.ResourceType.Split('/')[0]} | Select-Object -Unique
+        $resourceTypes = @(Az.Resources\Get-AzResource | Where-Object {$_.ResourceGroupName -eq $this.ResourceGroupName}  | select-Object -Property ResourceType -Unique).ForEach{$_.ResourceType.Split('/')[0]} | Select-Object -Unique
         foreach ($resourceType in $resourceTypes)
         {            
             $tempObj = [ResourceProvider]::new($resourceType, $this.ResourceGroupName);            
@@ -186,7 +185,7 @@ class ResourceProvider : SHiPSDirectory
         $obj =  @()
 
         $resourceTypeTokens = @()
-        @(& "$script:AzureRM_Resources\Get-AzureRmResource" | Where-Object {$_.ResourceGroupName -eq $this.resourceGroupName} | Select-Object -Property ResourceType -Unique).ForEach{
+        @(Az.Resources\Get-AzResource | Where-Object {$_.ResourceGroupName -eq $this.resourceGroupName} | Select-Object -Property ResourceType -Unique).ForEach{
 
             $providerNS = $_.ResourceType.Split('/')[0]
             $resourceType = $_.ResourceType.Substring($_.ResourceType.IndexOf('/')+1)
@@ -233,16 +232,16 @@ class ResourceType : SHiPSDirectory
     {        
         $obj =  @()
 
-        $azureRMResourceParams = @{'ResourceGroupName'="$($this.resourceGroupName)"}
-        $azureRMResourceParams += @{'ResourceType'="$($this.resourceType)"}
-        $azureRMResourceParams += @{'ExpandProperties'=$true}
+        $AzResourceParams = @{'ResourceGroupName'="$($this.resourceGroupName)"}
+        $AzResourceParams += @{'ResourceType'="$($this.resourceType)"}
+        $AzResourceParams += @{'ExpandProperties'=$true}
 
         if ($this.ProviderContext.Filter)
         {
-            $azureRMResourceParams += @{'ODataQuery'=(Get-ODataQueryFilter -filter $this.ProviderContext.Filter)}
+            $AzResourceParams += @{'ODataQuery'=(Get-ODataQueryFilter -filter $this.ProviderContext.Filter)}
         }
         
-        @(& "$script:AzureRM_Resources\Get-AzureRmResource" @azureRMResourceParams).Foreach{
+        @(Az.Resources\Get-AzResource @AzResourceParams).Foreach{
                     
             if ($_.PSTypeNames.Contains('Microsoft.Network.networkSecurityGroups'))
             {   
