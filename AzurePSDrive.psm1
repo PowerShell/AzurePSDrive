@@ -86,8 +86,7 @@ class Subscription : SHiPSDirectory
 
     [object[]] GetChildItem()
     {        
-        # TODO BUGBUG Select-AzureRmSubscription be fixed next week
-        Az.Profile\Select-AzureRmSubscription -SubscriptionName $this.SubscriptionName -TenantId $this.TenantId
+        Az.Profile\Select-AzSubscription -SubscriptionName $this.SubscriptionName -TenantId $this.TenantId
         $obj =  @()
 
         $obj+=[AllResources]::new();
