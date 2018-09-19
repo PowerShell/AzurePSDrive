@@ -133,6 +133,12 @@ class Blobs : SHiPSDirectory
         }         
         return $obj     
     }
+
+    [object] SetContent([string]$content, [string]$path)
+    {
+        Write-Error -Message "Set-Content is not supported under 'Blobs' service. Try it again under Files\<Share> directory."
+        return $null
+    }
 }
 
 [SHiPSProvider(UseCache=$true)]
@@ -179,6 +185,12 @@ class Files : SHiPSDirectory
              [FileShare]::new($_.Name, $this.data.Context, "$fileshare$($_.Name);$($accountInfo)");
             }
     }
+
+    [object] SetContent([string]$content, [string]$path)
+    {
+        Write-Error -Message "Set-Content is not supported under 'Files' service. Try it again under its subfolders."
+        return $null
+    }
 }
 
 [SHiPSProvider(UseCache=$true)]
@@ -197,6 +209,12 @@ class Tables : SHiPSDirectory
     {     
         return @($this.result | Sort-Object Name)    
     }
+
+    [object] SetContent([string]$content, [string]$path)
+    {
+        Write-Error -Message "Set-Content is not supported under 'Tables' service. Try it again under Files\<Share> directory."
+        return $null
+    }
 }
 
 [SHiPSProvider(UseCache=$true)]
@@ -214,6 +232,12 @@ class Queues : SHiPSDirectory
     [object[]] GetChildItem()
     {     
         return @($this.result | Sort-Object Name)  
+    }
+
+    [object] SetContent([string]$content, [string]$path)
+    {
+        Write-Error -Message "Set-Content is not supported under 'Queues' service. Try it again under Files\<Share> directory."
+        return $null
     }
 }
 
