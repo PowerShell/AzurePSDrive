@@ -1,10 +1,10 @@
 $PSScriptRoot = $MyInvocation.MyCommand.Path
 
-$script:AzureRM_Profile = if($IsCoreCLR){'AzureRM.Profile.NetCore'}else{'AzureRM.Profile'}
-$script:AzureRM_Resources = if($IsCoreCLR){'AzureRM.Resources.Netcore'}else{'AzureRM.Resources'}
-$script:AzureRM_Compute = if($IsCoreCLR){'AzureRM.Compute.NetCore'}else{'AzureRM.Compute'}
-$script:AzureRM_Network = if($IsCoreCLR){'AzureRM.Network.NetCore'}else{'AzureRM.Network'}
-$script:AzureRM_Storage = if($IsCoreCLR){'AzureRM.Storage.NetCore'}else{'AzureRM.Storage'}
+$script:Az_Profile = 'Az.Profile'
+$script:Az_Resources = 'Az.Resources'
+$script:Az_Compute ='Az.Compute'
+$script:Az_Network = 'Az.Network'
+$script:Az_Storage = 'Az.Storage'
 
 function Invoke-AzurePSDriveTests([string]$subscriptionName = 'AutomationTeam')
 {
@@ -43,34 +43,34 @@ function Initialize-TestEnvironment
     }
     else
     {
-        $dependencyInstalled = (Get-Module -ListAvailable $script:AzureRM_Resources | ForEach-Object Version) -ge [version]"4.2"
+        $dependencyInstalled = (Get-Module -ListAvailable $script:Az_Resources | ForEach-Object Version) -ge [version]"4.2"
         if (-not $dependencyInstalled)
         {
-            Save-Module -Name $script:AzureRM_Resources -MinimumVersion 4.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+            Save-Module -Name $script:Az_Resources -MinimumVersion 4.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
         }
 
-        $dependencyInstalled = (Get-Module -ListAvailable $script:AzureRM_Profile | ForEach-Object Version) -ge [version]"3.2"
+        $dependencyInstalled = (Get-Module -ListAvailable $script:Az_Profile | ForEach-Object Version) -ge [version]"3.2"
         if (-not $dependencyInstalled)
         {
-            Save-Module -Name $script:AzureRM_Profile -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+            Save-Module -Name $script:Az_Profile -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
         }
 
-        $dependencyInstalled = (Get-Module -ListAvailable $script:AzureRM_Compute | ForEach-Object Version) -ge [version]"3.2"
+        $dependencyInstalled = (Get-Module -ListAvailable $script:Az_Compute | ForEach-Object Version) -ge [version]"3.2"
         if (-not $dependencyInstalled)
         {
-            Save-Module -Name $script:AzureRM_Compute -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+            Save-Module -Name $script:Az_Compute -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
         }
 
-        $dependencyInstalled = (Get-Module -ListAvailable $script:AzureRM_Network | ForEach-Object Version) -ge [version]"4.2"
+        $dependencyInstalled = (Get-Module -ListAvailable $script:Az_Network | ForEach-Object Version) -ge [version]"4.2"
         if (-not $dependencyInstalled)
         {
-            Save-Module -Name $script:AzureRM_Network -MinimumVersion 4.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+            Save-Module -Name $script:Az_Network -MinimumVersion 4.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
         }
 
-        $dependencyInstalled = (Get-Module -ListAvailable $script:AzureRM_Storage | ForEach-Object Version) -ge [version]"3.2"
+        $dependencyInstalled = (Get-Module -ListAvailable $script:Az_Storage | ForEach-Object Version) -ge [version]"3.2"
         if (-not $dependencyInstalled)
         {
-            Save-Module -Name $script:AzureRM_Storage -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+            Save-Module -Name $script:Az_Storage -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
         }
 
         $SHiPSInstalled = Get-Module -ListAvailable -Name SHiPS 
@@ -79,30 +79,30 @@ function Initialize-TestEnvironment
             Save-Module -Name SHiPS -Force -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
         }
 
-        Import-Module -Name $script:AzureRM_Resources -Force -Verbose
-        Import-Module -Name $script:AzureRM_Profile -Force -Verbose
-        Import-Module -Name $script:AzureRM_Compute -Force -Verbose
-        Import-Module -Name $script:AzureRM_Network -Force -Verbose
-        Import-Module -Name $script:AzureRM_Storage -Force -Verbose    
+        Import-Module -Name $script:Az_Resources -Force -Verbose
+        Import-Module -Name $script:Az_Profile -Force -Verbose
+        Import-Module -Name $script:Az_Compute -Force -Verbose
+        Import-Module -Name $script:Az_Network -Force -Verbose
+        Import-Module -Name $script:Az_Storage -Force -Verbose    
     }
 
     Import-Module -Name SHiPS -Force -Verbose
-    & $script:AzureRM_Profile\Disable-AzureRmDataCollection
+    & $script:Az_Profile\Disable-AzDataCollection
 }
 
 # Ensure all Test dependencies are installed when using PowerShell Core based environment
 function Initialize-TestEnvironmentPSCore
 {
-    Install-Module -Name $script:AzureRM_Resources -Force -Verbose
-    Install-Module -Name $script:AzureRM_Profile -Force -Verbose
-    Install-Module -Name $script:AzureRM_Compute -Force -Verbose
-    Install-Module -Name $script:AzureRM_Network -Force -Verbose
-    Install-Module -Name $script:AzureRM_Storage -Force -Verbose    
+    Install-Module -Name $script:Az_Resources -Force -Verbose
+    Install-Module -Name $script:Az_Profile -Force -Verbose
+    Install-Module -Name $script:Az_Compute -Force -Verbose
+    Install-Module -Name $script:Az_Network -Force -Verbose
+    Install-Module -Name $script:Az_Storage -Force -Verbose    
 }
 
 
-# Login to AzureRM using Service Principal
-function Login-AzureRM
+# Login to Az using Service Principal
+function Login-Az
 {
     # These values are supplied from the environment, such as using Appveyor encryption
     # https://www.appveyor.com/docs/build-configuration/#secure-variables
@@ -114,5 +114,5 @@ function Login-AzureRM
     $secureString = ConvertTo-SecureString -String $password -AsPlainText -Force
     $cred = New-Object System.Management.Automation.PSCredential($azureAdAppId, $secureString)
 
-    & $script:AzureRM_Profile\Login-AzureRmAccount -ServicePrincipal -Credential $cred -TenantId $tenantId -Verbose -ErrorAction Stop
+    & $script:Az_Profile\Login-AzAccount -ServicePrincipal -Credential $cred -TenantId $tenantId -Verbose -ErrorAction Stop
 }

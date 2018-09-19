@@ -12,18 +12,18 @@
 
 
 ### Introduction:
-AzurePSDrive provider is a [SHiPS](https://github.com/PowerShell/SHiPS) based PowerShell provider to simplify navigation and discovery of [Azure Resource Manager](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview) items. This is based on [AzureRM cmdlets](https://msdn.microsoft.com/en-us/library/mt125356.aspx).
+AzurePSDrive provider is a [SHiPS](https://github.com/PowerShell/SHiPS) based PowerShell provider to simplify navigation and discovery of [Azure Resource Manager](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview) items. This is based on [Az cmdlets](https://msdn.microsoft.com/en-us/library/mt125356.aspx).
 The provider allows to browse Azure resources such as Subscriptions, ResourceGroups, deployments in providers such as Compute, Network, Storage. Deployments such as VirtualMachines, StorageContainers, NetworkInterfaces, SecurityGroups, VNets, WebApps can be seamlessly discovered including useful data about these.
 
 ### Usage:
-Using this provider is self explanatory. You are encouraged to traverse various resources such as Compute, Network, Storage, WebApps and so on. AzurePSDrive provider shows only AzureRM providers that have deployments such as Virtual machines, Storage Containers.
+Using this provider is self explanatory. You are encouraged to traverse various resources such as Compute, Network, Storage, WebApps and so on. AzurePSDrive provider shows only Az providers that have deployments such as Virtual machines, Storage Containers.
 This version supports only retrieving Resource Manager items.
 
 ```
 # Authenticate to your Azure account
-# Login-AzureRMAccount
+# Login-AzAccount
 
-# Create a drive for AzureRM
+# Create a drive for Az
 $driveName = 'Az'
 Import-Module AzurePSDrive
 New-PSDrive -Name $driveName -PSProvider SHiPS -Root AzurePSDrive#Azure
@@ -82,8 +82,8 @@ JRG                 jvm1    eastus      Standard_DS1_v2  Windows   jnic-1   Succ
 JRG                 jvm2    westus      Standard_F1s     Linux      nic-2   Succeeded          running
 
 # Start or Stop a VM
-dir jvm2 | Stop-AzureRmVM
-PS az:\AutomationGroup\VirtualMachines> dir .\jvm2 | Stop-AzureRmVM
+dir jvm2 | Stop-AzVM
+PS az:\AutomationGroup\VirtualMachines> dir .\jvm2 | Stop-AzVM
 
 # Search all storage accounts under my subscription
 PS az:\AutomationGroup\StorageAccounts> dir
@@ -203,16 +203,16 @@ ServerFarmName  Location ProvisioningState NumberOfWorkers NumberOfSites WebSpac
 ```
 
 ### Dependencies:
-[AzureRM.Profile, AzureRM.Resources, AzureRM.Compute, AzureRM.Storage, AzureRM.Websites](https://www.powershellgallery.com/packages/AzureRM) and [SHiPS](https://github.com/PowerShell/SHiPS) PowerShell modules are required.
+[Az.Profile, Az.Resources, Az.Compute, Az.Storage, Az.Websites](https://www.powershellgallery.com/packages/Az) and [SHiPS](https://github.com/PowerShell/SHiPS) PowerShell modules are required.
 
 ### Caching:
 Top level objects such as Subscriptions, Resource Groups, Resource Providers are cached to improve performance.
 Use ```dir -Force``` to refresh from Azure service. However, leaf level objects such as Virtual Machines, Network Interfaces, WebSites are not cached, since these items can have a smaller life cycle.
 
-### Server side filtering using AzureRM ODataQuery
+### Server side filtering using Az ODataQuery
 Supports performing server side filtering using ```$filter``` ODataQuery semantics. Simply use ```dir -Filter``` option when retrieving items.
 
-### Supported AzureRM Provider Types in format.ps1xml:
+### Supported Az Provider Types in format.ps1xml:
 
 | ProviderType | Name  | FullType |
 | -----------  | --------------| --------------|

@@ -1,8 +1,5 @@
 ﻿using namespace Microsoft.PowerShell.SHiPS
 
-$script:Azure_Storage = if($IsCoreCLR){'Azure.Storage.NetCore'}else{'Azure.Storage'}
-$script:AzureRM_Storage = if($IsCoreCLR){'AzureRM.Storage.NetCore'}else{'AzureRM.Storage'}
-
 
 [SHiPSProvider(UseCache=$true)]
 class StorageAccounts : SHiPSDirectory
@@ -18,7 +15,7 @@ class StorageAccounts : SHiPSDirectory
     [object[]] GetChildItem()
     {
         $obj =  @()                     
-        @(& "$script:AzureRM_Storage\Get-AzureRmStorageAccount").Foreach{
+        @(Az.Storage\Get-AzStorageAccount).Foreach{
              $obj += [StorageAccount]::new($($_.StorageAccountName), $_) 
         }          
         return $obj 
@@ -43,7 +40,7 @@ class StorageAccount : SHiPSDirectory
         {
             try
             {
-                $result=& "$script:Azure_Storage\Get-AzureStorageContainer" -Context $this.data.Context -ErrorAction SilentlyContinue -ErrorVariable ev
+                $result=Az.Storage\Get-AzStorageContainer -Context $this.data.Context -ErrorAction SilentlyContinue -ErrorVariable ev
                 if($ev) {
                     Write-Verbose $ev.Exception
                 }else{
@@ -60,7 +57,7 @@ class StorageAccount : SHiPSDirectory
         {
             try
             {
-                $result=& "$script:Azure_Storage\Get-AzureStorageShare" -Context $this.data.Context -ErrorAction SilentlyContinue -ErrorVariable ev
+                $result=Az.Storage\Get-AzStorageShare -Context $this.data.Context -ErrorAction SilentlyContinue -ErrorVariable ev
                 if ($ev) {
                     Write-Verbose $ev.Exception
                 } else {
@@ -77,7 +74,7 @@ class StorageAccount : SHiPSDirectory
         {
             try
             {
-                $result=& "$script:Azure_Storage\Get-AzureStorageTable" -Context $this.data.Context  -ErrorAction SilentlyContinue -ErrorVariable ev
+                $result=Az.Storage\Get-AzStorageTable -Context $this.data.Context  -ErrorAction SilentlyContinue -ErrorVariable ev
                 if ($ev){
                     Write-Verbose $ev.Exception 
                 } else {
@@ -93,7 +90,7 @@ class StorageAccount : SHiPSDirectory
         if ($this.data.PrimaryEndpoints.Queue -ne $null)
         {
             try {
-                $result=& "$script:Azure_Storage\Get-AzureStorageQueue" -Context $this.data.Context -ErrorAction SilentlyContinue -ErrorVariable ev
+                $result=Az.Storage\Get-AzStorageQueue -Context $this.data.Context -ErrorAction SilentlyContinue -ErrorVariable ev
                 if ($ev) {
                     Write-Verbose $ev.Exception
                 } else {
@@ -135,6 +132,12 @@ class Blobs : SHiPSDirectory
             $obj+= [Blob]::new($_.Name, $_);                  
         }         
         return $obj     
+    }
+
+    [object] SetContent([string]$content, [string]$path)
+    {
+        Write-Error -Message "Set-Content is not supported under 'Blobs'. Try it again under Files\<Share> directory."
+        return $null
     }
 }
 
@@ -182,6 +185,12 @@ class Files : SHiPSDirectory
              [FileShare]::new($_.Name, $this.data.Context, "$fileshare$($_.Name);$($accountInfo)");
             }
     }
+
+    [object] SetContent([string]$content, [string]$path)
+    {
+        Write-Error -Message "Set-Content is not supported under 'Files'. Try it again under its subfolders."
+        return $null
+    }
 }
 
 [SHiPSProvider(UseCache=$true)]
@@ -200,6 +209,12 @@ class Tables : SHiPSDirectory
     {     
         return @($this.result | Sort-Object Name)    
     }
+
+    [object] SetContent([string]$content, [string]$path)
+    {
+        Write-Error -Message "Set-Content is not supported under 'Tables'. Try it again under Files\<Share> directory."
+        return $null
+    }
 }
 
 [SHiPSProvider(UseCache=$true)]
@@ -217,6 +232,12 @@ class Queues : SHiPSDirectory
     [object[]] GetChildItem()
     {     
         return @($this.result | Sort-Object Name)  
+    }
+
+    [object] SetContent([string]$content, [string]$path)
+    {
+        Write-Error -Message "Set-Content is not supported under 'Queues'. Try it again under Files\<Share> directory."
+        return $null
     }
 }
 
@@ -238,50 +259,147 @@ class FileShare : SHiPSDirectory
     {
         $obj =  @()
 
-        & "$script:Azure_Storage\Get-AzureStorageFile" -Context $this.context -ShareName $this.shareName | ForEach-Object {
+        Az.Storage\Get-AzStorageFile -Context $this.context -ShareName $this.shareName | ForEach-Object {
             if($_.GetType().Name -eq "CloudFileDirectory") {
-                $obj+=[FileFolder]::new($_.Name, $_)
+                $obj+=[FileFolder]::new($_.Name, $this.shareName, $_.Name, $this.context, $_)
             } else {
-                $obj+=[FileShareLeaf]::new($_.Name)
+                $obj+=[FileShareLeaf]::new($_.Name, $this.shareName, $null, $this.context)
             }
         }
 
         return $obj
     }
+
+    [object] SetContent([string]$content, [string]$path)
+    {
+        $leafName = SetContentUtility -Content $content -Path $path -ShareName $this.shareName -FolderName $null -Context $this.context
+        if($leafName)
+        {
+            # Returning the currently object so that the SHiPS can cache it
+            return [FileShareLeaf]::new($leafName, $this.shareName, $null, $this.context)
+        }
+        return $null
+    }
 }
 
 class FileShareLeaf : SHiPSLeaf
 {
-    FileShareLeaf([string]$name): base($name)
+    Hidden [string]$fileName = $null
+    Hidden [string]$shareName = $null
+    Hidden [object]$context = $null
+    Hidden [string]$folderName = $null
+    Hidden [string]$filePath = $null
+
+    FileShareLeaf([string]$name, [string]$shareName, [string]$folderName, [object]$context): base($name)
     {
+        $this.context = $context
+        $this.fileName = $name
+        $this.shareName = $shareName
+        $this.folderName = $folderName
+        if($this.folderName)
+        {
+            $this.filePath = join-path $this.folderName $this.fileName
+        }
+        else
+        {
+            $this.filePath = $this.fileName
+        }
+    }
+
+    [object] GetContent()
+    {
+        $tmpfile = $null
+        try {
+            $tmpfile = [System.IO.Path]::GetTempFileName()
+
+            Write-Verbose "Calling Get-AzStorageFilecontent -Path $($this.filePath) -ShareName $($this.shareName) -Destination $tmpfile ..." -Verbose
+
+            $ev = $null
+            Az.Storage\Get-AzStorageFilecontent -Path $this.filePath -Context $this.context -ShareName $this.shareName -Destination $tmpfile -Force -ErrorVariable ev
+
+            if(-not $ev)
+            {
+                $bp = $this.ProviderContext.BoundParameters
+
+                if($bp.ContainsKey('Path'))
+                {
+                    $null = $bp.Remove('Path')
+                }
+
+                return Microsoft.PowerShell.Management\Get-Content -Path $tmpfile @bp
+            }
+            return $null
+        }
+        finally {
+            if(Test-Path $tmpfile) {
+                Microsoft.PowerShell.Management\Remove-Item -Path $tmpfile -Force -ErrorAction SilentlyContinue
+            }
+        }
+    }
+
+    [object] SetContent([string]$content, [string]$path)
+    {
+        $leafName = SetContentUtility -Content $content -Path $path -ShareName $this.shareName -FolderName $this.folderName  -Context $this.context
+
+        if($leafName)
+        {
+            # Returning the currently object so that the SHiPS can cache it
+            return $this
+        }
+
+        return $null
     }
 }
 
 [SHiPSProvider(UseCache=$true)]
 class FileFolder : SHiPSDirectory
 {
-    Hidden [string]$DirectoryName = $null
-    Hidden [object]$CloudFileDirectory = $null
+    Hidden [string]$folderName = $null
+    Hidden [object]$cloudFileDirectory = $null
 
-    FileFolder ([string]$name, [object]$cloudFileDirectory) : base ($name) 
+    Hidden [object]$context = $null
+    Hidden [string]$shareName = $null
+
+    FileFolder ([string]$name, [string]$shareName, [string]$dir, [object]$context, [object]$cloudFileDirectory) : base ($name)
     {
-        $this.DirectoryName = $name
-        $this.CloudFileDirectory = $cloudFileDirectory
+        $this.folderName = $dir
+        $this.cloudFileDirectory = $cloudFileDirectory
+        $this.context = $context
+        $this.shareName = $shareName
     }
-
 
     [object[]] GetChildItem()
     { 
         $obj =  @()
 
-        & "$script:Azure_Storage\Get-AzureStorageFile" -Directory $this.CloudFileDirectory | ForEach-Object {
+        Az.Storage\Get-AzStorageFile -Directory $this.cloudFileDirectory | ForEach-Object {
             if($_.GetType().Name -eq "CloudFileDirectory") {
-                $obj+=[FileFolder]::new($_.Name, $_)
+                if($this.folderName)
+                {
+                    $dir = Microsoft.PowerShell.Management\Join-path -Path $this.folderName -ChildPath $_.Name
+                }
+                else {
+                    $dir=$_.Name
+                }
+                $obj+=[FileFolder]::new($_.Name, $this.shareName, $dir, $this.context, $_)
+
             } else {
-                $obj+=[FileShareLeaf]::new($_.Name)
+                $obj+=[FileShareLeaf]::new($_.Name, $this.shareName, $this.folderName, $this.context )
             }
         }
         return $obj
+    }
+
+    [object] SetContent([string]$content, [string]$path)
+    {
+        $leafName = SetContentUtility -Content $content -Path $path -ShareName $this.shareName -FolderName $this.folderName -Context $this.context
+        # Returning the currently object so that the SHiPS can cache it
+        if($leafName)
+        {
+            return [FileShareLeaf]::new($leafName, $this.shareName, $this.folderName, $this.context)
+        }
+
+        return $null
     }
 }
 
@@ -297,7 +415,46 @@ class Blob : SHiPSDirectory
 
     [object[]] GetChildItem()
     {      
-        return @(& "$script:Azure_Storage\Get-AzureStorageBlob" -Context $this.data.Context -Container $this.data.Name | Sort-Object Name)
+        return @(Az.Storage\Get-AzStorageBlob -Context $this.data.Context -Container $this.data.Name | Sort-Object Name)
     }
 }
 
+
+Function SetContentUtility()
+{
+    param(
+        [string]$Content,
+        [string]$Path,
+        [string]$ShareName,
+        [string]$FolderName,
+        [object]$Context
+    )
+
+    # Save the text content to a local temp file because the Set-AzureStorageFileContent cmdlet takes file only
+    $tmpfile = [System.IO.Path]::GetTempFileName()
+
+    try {
+
+        Microsoft.PowerShell.Management\Set-Content -Path $tmpfile -Value $Content
+
+        # $content is the 'Value' passed in from Set-Content
+        # $path is the full path. e.g., Azure:\<subscription>\StorageAccounts\<myaccount>\Files\<Share>\hello.ps1".
+        # Get the file leaf node name
+        $newPath = Microsoft.PowerShell.Management\Split-Path $Path -Leaf
+
+        # Get the file share target path
+        $destionation=[System.IO.Path]::Combine($FolderName, $newPath)
+
+        Write-Verbose "Calling Set-AzStorageFileContent -ShareName $ShareName -Source $tmpfile -Path $destionation" -Verbose
+        $ev = $null
+        Az.Storage\Set-AzStorageFileContent -Context $Context -ShareName $ShareName -Source $tmpfile -Path $destionation -Force -ErrorVariable ev
+
+        if($ev) { return $null }
+        return $newPath
+    }
+    finally {
+        if($tmpfile) {
+            Microsoft.PowerShell.Management\Remove-Item $tmpfile -Force -ErrorAction SilentlyContinue
+        }
+    }
+}

@@ -8,7 +8,7 @@
 RootModule = '.\AzurePSDrive.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.8.7'
+ModuleVersion = '0.9.2'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -47,15 +47,8 @@ Description = 'AzurePSDrive provider is a SHiPS based PowerShell provider to sim
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-RequiredModules = if($PSEdition -eq 'Core')
-{
-    #Bug in AzureRM.Websites.netcore. @('AzureRM.Profile.netcore', 'AzureRM.Resources.netcore', 'AzureRM.Compute.netcore', 'AzureRM.Websites.netcore', 'AzureRM.Storage.netcore','SHiPS')
-    @('AzureRM.Profile.netcore', 'AzureRM.Resources.netcore', 'AzureRM.Compute.netcore', 'AzureRM.Storage.netcore','SHiPS')
-}
-else #Desktop
-{
-    @('AzureRM.Profile', 'AzureRM.Resources', 'AzureRM.Compute', 'AzureRM.Websites', 'Azure.Storage','SHiPS')
-}
+RequiredModules =  @('Az.Profile', 'Az.Resources', 'Az.Compute', 'Az.Storage','SHiPS')
+
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
@@ -99,7 +92,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = 'Azure', 'Navigation', 'SHiPS', 'AzureRM'
+        Tags = 'Azure', 'Navigation', 'SHiPS', 'AzureRM', 'Az'
 
         # A URL to the license for this module.
         LicenseUri = 'https://github.com/PowerShell/AzurePSDrive/blob/master/LICENSE.txt'
