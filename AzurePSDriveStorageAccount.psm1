@@ -438,7 +438,7 @@ Function SetContentUtility()
         Microsoft.PowerShell.Management\Set-Content -Path $tmpfile -Value $Content
 
         # $content is the 'Value' passed in from Set-Content
-        # $path is the full path. e.g., Azure:\AutomationTeam\StorageAccounts\myaccount\Files\HelloWorld\hello.ps1".
+        # $path is the full path. e.g., Azure:\<subscription>\StorageAccounts\<myaccount>\Files\<Share>\hello.ps1".
         # Get the file leaf node name
         $newPath = Microsoft.PowerShell.Management\Split-Path $Path -Leaf
 
