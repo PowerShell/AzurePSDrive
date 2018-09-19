@@ -136,7 +136,7 @@ class Blobs : SHiPSDirectory
 
     [object] SetContent([string]$content, [string]$path)
     {
-        Write-Error -Message "Set-Content is not supported under 'Blobs' service. Try it again under Files\<Share> directory."
+        Write-Error -Message "Set-Content is not supported under 'Blobs'. Try it again under Files\<Share> directory."
         return $null
     }
 }
@@ -188,7 +188,7 @@ class Files : SHiPSDirectory
 
     [object] SetContent([string]$content, [string]$path)
     {
-        Write-Error -Message "Set-Content is not supported under 'Files' service. Try it again under its subfolders."
+        Write-Error -Message "Set-Content is not supported under 'Files'. Try it again under its subfolders."
         return $null
     }
 }
@@ -212,7 +212,7 @@ class Tables : SHiPSDirectory
 
     [object] SetContent([string]$content, [string]$path)
     {
-        Write-Error -Message "Set-Content is not supported under 'Tables' service. Try it again under Files\<Share> directory."
+        Write-Error -Message "Set-Content is not supported under 'Tables'. Try it again under Files\<Share> directory."
         return $null
     }
 }
@@ -236,7 +236,7 @@ class Queues : SHiPSDirectory
 
     [object] SetContent([string]$content, [string]$path)
     {
-        Write-Error -Message "Set-Content is not supported under 'Queues' service. Try it again under Files\<Share> directory."
+        Write-Error -Message "Set-Content is not supported under 'Queues'. Try it again under Files\<Share> directory."
         return $null
     }
 }
