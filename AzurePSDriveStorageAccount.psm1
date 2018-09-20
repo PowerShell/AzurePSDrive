@@ -392,6 +392,7 @@ class FileFolder : SHiPSDirectory
 
     [object] SetContent([string]$content, [string]$path)
     {
+        Write-Verbose "Folder = $($this.folderName), CurrentNode = $($this.name)"
         $leafName = SetContentUtility -Content $content -Path $path -ShareName $this.shareName -FolderName $this.folderName -Context $this.context
         # Returning the currently object so that the SHiPS can cache it
         if($leafName)
@@ -439,18 +440,36 @@ Function SetContentUtility()
 
         # $content is the 'Value' passed in from Set-Content
         # $path is the full path. e.g., Azure:\<subscription>\StorageAccounts\<myaccount>\Files\<Share>\hello.ps1".
-        # Get the file leaf node name
-        $newPath = Microsoft.PowerShell.Management\Split-Path $Path -Leaf
 
-        # Get the file share target path
-        $destionation=[System.IO.Path]::Combine($FolderName, $newPath)
+        # Get the file share target path for Set-AzStorageFileContent
+        # strip off from the path until the share name
+        $restPath = $Path -replace  "^.*$ShareName"
+        if(-not $restPath)
+        {
+            Write-Error -Message "Set-Content is not supported at FileShare: $Path. It's supported for files only."
+            return $null
+        }
+        $destionation = $restPath.TrimStart('/\')
+        if(-not $destionation)
+        {
+            Write-Error -Message "Set-Content is not supported at FileShare: $Path. It's supported for files only."
+            return $null
+        }
+        Write-Verbose "Folder = $FolderName, Path = $path, Destionation = $destionation"
+        if($FolderName -eq $destionation)
+        {
+            Write-Error -Message "Set-Content is not supported at Folder path: '$FolderName'. It's supported for files only."
+            return $null
+        }
 
+        # See details https://docs.microsoft.com/en-us/powershell/module/azure.storage/set-azurestoragefilecontent?view=azurermps-6.8.1
         Write-Verbose "Calling Set-AzStorageFileContent -ShareName $ShareName -Source $tmpfile -Path $destionation" -Verbose
         $ev = $null
         Az.Storage\Set-AzStorageFileContent -Context $Context -ShareName $ShareName -Source $tmpfile -Path $destionation -Force -ErrorVariable ev
 
         if($ev) { return $null }
-        return $newPath
+
+        return (Microsoft.PowerShell.Management\Split-Path $Path -Leaf)
     }
     finally {
         if($tmpfile) {
