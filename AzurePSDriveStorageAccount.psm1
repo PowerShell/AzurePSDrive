@@ -136,7 +136,7 @@ class Blobs : SHiPSDirectory
 
     [object] SetContent([string]$content, [string]$path)
     {
-        Write-Error -Message "Set-Content is not supported under 'Blobs'. Try it again under Files\<Share> directory."
+        Write-Error -Message "Set-Content is not supported under 'Blobs'. Try again under Files\<Share> directory."
         return $null
     }
 }
@@ -188,7 +188,7 @@ class Files : SHiPSDirectory
 
     [object] SetContent([string]$content, [string]$path)
     {
-        Write-Error -Message "Set-Content is not supported under 'Files'. Try it again under its subfolders."
+        Write-Error -Message "Set-Content is not supported under 'Files'. Try again under its sub-directories."
         return $null
     }
 }
@@ -212,7 +212,7 @@ class Tables : SHiPSDirectory
 
     [object] SetContent([string]$content, [string]$path)
     {
-        Write-Error -Message "Set-Content is not supported under 'Tables'. Try it again under Files\<Share> directory."
+        Write-Error -Message "Set-Content is not supported under 'Tables'. Try again under Files\<Share> directory."
         return $null
     }
 }
@@ -236,7 +236,7 @@ class Queues : SHiPSDirectory
 
     [object] SetContent([string]$content, [string]$path)
     {
-        Write-Error -Message "Set-Content is not supported under 'Queues'. Try it again under Files\<Share> directory."
+        Write-Error -Message "Set-Content is not supported under 'Queues'. Try again under Files\<Share> directory."
         return $null
     }
 }
@@ -446,19 +446,19 @@ Function SetContentUtility()
         $restPath = $Path -replace  "^.*$ShareName"
         if(-not $restPath)
         {
-            Write-Error -Message "Set-Content is not supported at FileShare: $Path. It's supported for files only."
+            Write-Error -Message "Set-Content is not supported on FileShare: $Path. Only files are supported."
             return $null
         }
         $destionation = $restPath.TrimStart('/\')
         if(-not $destionation)
         {
-            Write-Error -Message "Set-Content is not supported at FileShare: $Path. It's supported for files only."
+            Write-Error -Message "Set-Content is not supported on FileShare: $Path. Only files are supported."
             return $null
         }
         Write-Verbose "Folder = $FolderName, Path = $path, Destionation = $destionation"
         if($FolderName -eq $destionation)
         {
-            Write-Error -Message "Set-Content is not supported at Folder path: '$FolderName'. It's supported for files only."
+            Write-Error -Message "Set-Content is not supported on directory path: '$FolderName'. Only files are supported."
             return $null
         }
 
