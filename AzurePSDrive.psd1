@@ -8,10 +8,10 @@
 RootModule = '.\AzurePSDrive.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.9.2'
+ModuleVersion = '0.9.3'
 
 # Supported PSEditions
-# CompatiblePSEditions = @()
+CompatiblePSEditions =@('Desk', 'Core')
 
 # ID used to uniquely identify this module
 GUID = '48573d34-007e-11e7-93ae-92361f002671'
@@ -29,7 +29,7 @@ Copyright = '(c) Microsoft Corporation. All rights reserved.'
 Description = 'AzurePSDrive provider is a SHiPS based PowerShell provider to simplify navigation and discovery of Azure Resource Manager items'
 
 # Minimum version of the Windows PowerShell engine required by this module
-# PowerShellVersion = ''
+PowerShellVersion = '5.1'
 
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
