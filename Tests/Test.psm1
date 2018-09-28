@@ -43,34 +43,34 @@ function Initialize-TestEnvironment
     }
     else
     {
-        $dependencyInstalled = (Get-Module -ListAvailable $script:Az_Resources | ForEach-Object Version) -ge [version]"4.2"
+        $dependencyInstalled = (Get-Module -ListAvailable $script:Az_Resources | ForEach-Object Version) -ge [version]"0.2"
         if (-not $dependencyInstalled)
         {
-            Save-Module -Name $script:Az_Resources -MinimumVersion 4.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+            Save-Module -Name $script:Az_Resources -MinimumVersion 0.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
         }
 
-        $dependencyInstalled = (Get-Module -ListAvailable $script:Az_Profile | ForEach-Object Version) -ge [version]"3.2"
+        $dependencyInstalled = (Get-Module -ListAvailable $script:Az_Profile | ForEach-Object Version) -ge [version]"0.2"
         if (-not $dependencyInstalled)
         {
-            Save-Module -Name $script:Az_Profile -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+            Save-Module -Name $script:Az_Profile -MinimumVersion 0.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
         }
 
-        $dependencyInstalled = (Get-Module -ListAvailable $script:Az_Compute | ForEach-Object Version) -ge [version]"3.2"
+        $dependencyInstalled = (Get-Module -ListAvailable $script:Az_Compute | ForEach-Object Version) -ge [version]"0.2"
         if (-not $dependencyInstalled)
         {
-            Save-Module -Name $script:Az_Compute -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+            Save-Module -Name $script:Az_Compute -MinimumVersion 0.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
         }
 
-        $dependencyInstalled = (Get-Module -ListAvailable $script:Az_Network | ForEach-Object Version) -ge [version]"4.2"
+        $dependencyInstalled = (Get-Module -ListAvailable $script:Az_Network | ForEach-Object Version) -ge [version]"0.2"
         if (-not $dependencyInstalled)
         {
-            Save-Module -Name $script:Az_Network -MinimumVersion 4.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+            Save-Module -Name $script:Az_Network -MinimumVersion 0.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
         }
 
-        $dependencyInstalled = (Get-Module -ListAvailable $script:Az_Storage | ForEach-Object Version) -ge [version]"3.2"
+        $dependencyInstalled = (Get-Module -ListAvailable $script:Az_Storage | ForEach-Object Version) -ge [version]"0.2"
         if (-not $dependencyInstalled)
         {
-            Save-Module -Name $script:Az_Storage -MinimumVersion 3.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
+            Save-Module -Name $script:Az_Storage -MinimumVersion 0.2.0 -Force -Verbose -path "$($env:ProgramFiles)\WindowsPowerShell\Modules"
         }
 
         $SHiPSInstalled = Get-Module -ListAvailable -Name SHiPS 
