@@ -17,10 +17,10 @@ class Azure : SHiPSDirectory
     {        
         # Ensure Session is logged-on to access Azure resources
         # This is done in the constructor so that it is a runtime check and not done during module import.
-        $context = Az.Profile\Get-AzContext
+        $context = Az.Accounts\Get-AzContext
         if ([string]::IsNullOrEmpty($($context.Account)))
         {
-            throw "Ensure that session has access to Azure resources - use Az.Profile\Connect-AzAccount or Az.Profile\Login-AzAccount"
+            throw "Ensure that session has access to Azure resources - use Az.Accounts\Connect-AzAccount or Az.Accounts\Login-AzAccount"
         }
     } 
 
@@ -35,7 +35,7 @@ class Azure : SHiPSDirectory
         if (-not $env:ACC_TID)
         {
             # Default tenantId not provided (perhaps provider is being run standalone => not in Cloud Shell)
-            $tenant = Az.Profile\Get-AzTenant
+            $tenant = Az.Accounts\Get-AzTenant
 
             if (($tenant -eq $null) -or ($tenant.Count -eq 0))
             {
@@ -45,7 +45,7 @@ class Azure : SHiPSDirectory
             # Use the first tenant, since this maps to the default directory chosen by the user via Portal
             $defaultTenantId = $tenant[0].Id
             Write-Verbose "Using TenantId '$($tenant[0].TenantId)'"                
-            Write-Verbose "To change default tenant: Use Az.profile\Get-AzTenant to retrieve your tenants corresponding to directories and set environment variable 'ACC_TID' to desired tenant"
+            Write-Verbose "To change default tenant: Use Az.Accounts\Get-AzTenant to retrieve your tenants corresponding to directories and set environment variable 'ACC_TID' to desired tenant"
             Write-Verbose "Reload AzurePSDrive provider OR use 'dir -Force' when navigating the subscription"
         }
         else
@@ -54,7 +54,7 @@ class Azure : SHiPSDirectory
             $defaultTenantId = $env:ACC_TID
         }
         
-        $subscriptions = $((Az.Profile\Get-AzSubscription -TenantId $defaultTenantId) | Sort-Object -Property Name)
+        $subscriptions = $((Az.Accounts\Get-AzSubscription -TenantId $defaultTenantId) | Sort-Object -Property Name)
         $subGroup = $subscriptions | Group-Object -Property Name
 
         foreach ($subscription in $subscriptions)
@@ -86,7 +86,7 @@ class Subscription : SHiPSDirectory
 
     [object[]] GetChildItem()
     {        
-        Az.Profile\Select-AzSubscription -SubscriptionName $this.SubscriptionName -TenantId $this.TenantId
+        Az.Accounts\Select-AzSubscription -SubscriptionName $this.SubscriptionName -TenantId $this.TenantId
         $obj =  @()
 
         $obj+=[AllResources]::new();
@@ -118,7 +118,7 @@ class ResourceGroups : SHiPSDirectory
 
     [object[]] GetChildItem()
     {
-        #Az.profile\Select-AzSubscription -SubscriptionName $this.SubscriptionName -TenantId $this.TenantId
+        #Az.Accounts\Select-AzSubscription -SubscriptionName $this.SubscriptionName -TenantId $this.TenantId
         $obj =  @()
         $subId = $this.SubscriptionId
 
