@@ -203,7 +203,7 @@ ServerFarmName  Location ProvisioningState NumberOfWorkers NumberOfSites WebSpac
 ```
 
 ### Dependencies:
-[Az.Profile, Az.Resources, Az.Compute, Az.Storage, Az.Websites](https://www.powershellgallery.com/packages/Az) and [SHiPS](https://github.com/PowerShell/SHiPS) PowerShell modules are required.
+[Az.Accounts, Az.Resources, Az.Compute, Az.Storage, Az.Websites](https://www.powershellgallery.com/packages/Az) and [SHiPS](https://github.com/PowerShell/SHiPS) PowerShell modules are required.
 
 ### Caching:
 Top level objects such as Subscriptions, Resource Groups, Resource Providers are cached to improve performance.

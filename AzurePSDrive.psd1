@@ -8,7 +8,7 @@
 RootModule = '.\AzurePSDrive.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.9.2'
+ModuleVersion = '0.9.3'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -47,7 +47,7 @@ Description = 'AzurePSDrive provider is a SHiPS based PowerShell provider to sim
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-RequiredModules =  @('Az.Profile', 'Az.Resources', 'Az.Compute', 'Az.Storage','SHiPS')
+RequiredModules =  @('Az.Accounts', 'Az.Resources', 'Az.Compute', 'Az.Storage','SHiPS')
 
 
 # Assemblies that must be loaded prior to importing this module

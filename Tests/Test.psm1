@@ -1,6 +1,6 @@
 $PSScriptRoot = $MyInvocation.MyCommand.Path
 
-$script:Az_Profile = 'Az.Profile'
+$script:Az_Profile = 'Az.Accounts'
 $script:Az_Resources = 'Az.Resources'
 $script:Az_Compute ='Az.Compute'
 $script:Az_Network = 'Az.Network'
